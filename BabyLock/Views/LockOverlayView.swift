@@ -48,17 +48,6 @@ struct LockOverlayView: View {
                 .padding(.top, 8)
                 .padding(.bottom, -2)
 
-                HStack(spacing: 32) {
-                    CommandKeyView(
-                        title: text(.onboardingLeftCommand),
-                        isActive: commandKeyState.isLeftCommandPressed
-                    )
-
-                    CommandKeyView(
-                        title: text(.onboardingRightCommand),
-                        isActive: commandKeyState.isRightCommandPressed
-                    )
-                }
             }
             .padding(32)
             .opacity(state.showsContent ? 1 : 0)
@@ -86,26 +75,6 @@ struct LockOverlayView: View {
 
     private func text(_ key: AppStrings.Key) -> String {
         AppStrings.text(key, language: preferences.appLanguage)
-    }
-}
-
-private struct CommandKeyView: View {
-    let title: String
-    let isActive: Bool
-
-    var body: some View {
-        Text(title)
-            .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(Color.white.opacity(isActive ? 0.86 : 0.64))
-            .frame(width: 104, height: 42)
-            .background(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(Color.white.opacity(isActive ? 0.16 : 0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .stroke(Color.white.opacity(isActive ? 0.38 : 0.22), lineWidth: 1)
-            )
     }
 }
 

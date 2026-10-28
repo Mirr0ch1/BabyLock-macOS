@@ -31,7 +31,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: SettingsView())
         let window = NSWindow(contentViewController: hostingController)
         window.title = AppStrings.text(.settingsWindowTitle, language: PreferencesStore.shared.appLanguage)
-        window.setContentSize(NSSize(width: 560, height: 580))
+        window.setContentSize(NSSize(width: 560, height: 620))
         window.styleMask = [.titled, .closable, .miniaturizable, .fullSizeContentView]
         window.titlebarAppearsTransparent = true
         window.titleVisibility = .hidden

@@ -93,7 +93,7 @@ struct SettingsView: View {
             }
             .padding(24)
         }
-        .frame(width: 560, height: 580)
+        .frame(width: 560, height: 620)
         .background(WindowTitleHider(extendsContentIntoTitlebar: true))
         .onAppear {
             preferences.refreshLaunchAtLoginStatus()

@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Show toolchain
         run: |
@@ -57,7 +57,7 @@ jobs:
           ls -lh BabyLock-macOS.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: BabyLock-macOS
           path: BabyLock-macOS.zip
@@ -65,7 +65,7 @@ jobs:
 
       - name: Publish release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: BabyLock-macOS.zip
           generate_release_notes: true

@@ -44,17 +44,7 @@ struct LockHUDView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Color.white.opacity(0.62))
 
-                HStack(spacing: 8) {
-                    commandKeyChip(
-                        title: text(.onboardingLeftCommand),
-                        isActive: state.commandKeyState.isLeftCommandPressed
-                    )
-
-                    commandKeyChip(
-                        title: text(.onboardingRightCommand),
-                        isActive: state.commandKeyState.isRightCommandPressed
-                    )
-
+                HStack(spacing: 10) {
                     Text(text(.overlayExitInstruction))
                         .font(.system(size: 11.5))
                         .foregroundStyle(Color.white.opacity(0.56))
@@ -73,7 +63,7 @@ struct LockHUDView: View {
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
         .background(HUDChrome())
-        .padding(10)
+        .padding(20)
         .frame(width: 600)
         .opacity(state.showsContent ? 1 : 0)
         .offset(y: state.contentYOffset)
@@ -82,22 +72,6 @@ struct LockHUDView: View {
 
     private var blockedStatusKey: AppStrings.Key {
         preferences.blockPointerInput ? .overlayKeyboardAndPointerBlocked : .overlayKeyboardBlocked
-    }
-
-    private func commandKeyChip(title: String, isActive: Bool) -> some View {
-        Text(title)
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color.white.opacity(isActive ? 0.94 : 0.70))
-            .padding(.horizontal, 8)
-            .frame(height: 22)
-            .background(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .fill(Color.white.opacity(isActive ? 0.18 : 0.08))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                    .strokeBorder(Color.white.opacity(isActive ? 0.40 : 0.18), lineWidth: 1)
-            )
     }
 
     private func formattedTime(_ seconds: Int) -> String {
