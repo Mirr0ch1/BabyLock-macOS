@@ -3,45 +3,32 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$ROOT_DIR/build/Debug"
-APP_DIR="$BUILD_DIR/CleanLock.app"
+APP_DIR="$BUILD_DIR/Baby Lock.app"
 CONTENTS_DIR="$APP_DIR/Contents"
 MACOS_DIR="$CONTENTS_DIR/MacOS"
 RESOURCES_DIR="$CONTENTS_DIR/Resources"
-MODULE_CACHE_DIR="/private/tmp/cleanlock-module-cache"
+MODULE_CACHE_DIR="/private/tmp/babylock-module-cache"
 
-SWIFT_FILES=(
-  "$ROOT_DIR/CleanLock/App/AppDelegate.swift"
-  "$ROOT_DIR/CleanLock/App/CleanLockApp.swift"
-  "$ROOT_DIR/CleanLock/Controllers/MenuBarController.swift"
-  "$ROOT_DIR/CleanLock/Controllers/SettingsWindowController.swift"
-  "$ROOT_DIR/CleanLock/Managers/CleaningModeManager.swift"
-  "$ROOT_DIR/CleanLock/Managers/CursorController.swift"
-  "$ROOT_DIR/CleanLock/Managers/InputBlocker.swift"
-  "$ROOT_DIR/CleanLock/Managers/OverlayManager.swift"
-  "$ROOT_DIR/CleanLock/Managers/PermissionManager.swift"
-  "$ROOT_DIR/CleanLock/Managers/PointerDeviceSeizer.swift"
-  "$ROOT_DIR/CleanLock/Managers/PreferencesStore.swift"
-  "$ROOT_DIR/CleanLock/Models/AutoUnlockDuration.swift"
-  "$ROOT_DIR/CleanLock/Models/CleaningModeState.swift"
-  "$ROOT_DIR/CleanLock/Models/DisplayScope.swift"
-  "$ROOT_DIR/CleanLock/Models/Localization.swift"
-  "$ROOT_DIR/CleanLock/Models/OnboardingStep.swift"
-  "$ROOT_DIR/CleanLock/Views/AnimatedLockIcon.swift"
-  "$ROOT_DIR/CleanLock/Views/CleaningOverlayView.swift"
-  "$ROOT_DIR/CleanLock/Views/OnboardingView.swift"
-  "$ROOT_DIR/CleanLock/Views/SettingsView.swift"
-)
+SWIFT_FILES=()
+while IFS= read -r file; do
+  SWIFT_FILES+=("$file")
+done < <(find "$ROOT_DIR/BabyLock" -name '*.swift' -print | sort)
+
+if (( ${#SWIFT_FILES[@]} == 0 )); then
+  echo "No Swift files found" >&2
+  exit 1
+fi
 
 rm -rf "$APP_DIR"
 mkdir -p "$MACOS_DIR" "$RESOURCES_DIR" "$MODULE_CACHE_DIR"
 
 swiftc \
-  -target arm64-apple-macos13.0 \
+  -target "$(uname -m)-apple-macos13.0" \
   -module-cache-path "$MODULE_CACHE_DIR" \
   -g \
   -Onone \
   -D DEBUG \
-  -o "$MACOS_DIR/CleanLock" \
+  -o "$MACOS_DIR/Baby Lock" \
   "${SWIFT_FILES[@]}"
 
 cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
@@ -51,22 +38,26 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Baby Lock</string>
 	<key>CFBundleExecutable</key>
-	<string>CleanLock</string>
+	<string>Baby Lock</string>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundleIdentifier</key>
-	<string>dev.cleanlock.CleanLock</string>
+	<string>com.mirr0ch1.babylock</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>CleanLock</string>
+	<string>Baby Lock</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.2</string>
+	<string>1.0.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
@@ -74,7 +65,7 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSInputMonitoringUsageDescription</key>
-	<string>CleanLock uses input monitoring only to detect holding the left and right Command keys during cleaning mode.</string>
+	<string>Baby Lock uses Input Monitoring only to recognize the unlock gesture.</string>
 	<key>NSSupportsAutomaticTermination</key>
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
@@ -83,9 +74,10 @@ cat > "$CONTENTS_DIR/Info.plist" <<'PLIST'
 </plist>
 PLIST
 
-cp "$ROOT_DIR/CleanLock/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
-mkdir -p "$RESOURCES_DIR/en.lproj" "$RESOURCES_DIR/ru.lproj"
-cp "$ROOT_DIR/CleanLock/Resources/en.lproj/InfoPlist.strings" "$RESOURCES_DIR/en.lproj/InfoPlist.strings"
-cp "$ROOT_DIR/CleanLock/Resources/ru.lproj/InfoPlist.strings" "$RESOURCES_DIR/ru.lproj/InfoPlist.strings"
+cp "$ROOT_DIR/BabyLock/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+
+for lproj in "$ROOT_DIR"/BabyLock/Resources/*.lproj; do
+  cp -R "$lproj" "$RESOURCES_DIR/"
+done
 
 echo "$APP_DIR"

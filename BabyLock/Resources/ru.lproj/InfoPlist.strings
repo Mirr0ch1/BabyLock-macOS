@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Baby Lock";
+"NSInputMonitoringUsageDescription" = "Baby Lock использует «Мониторинг ввода» только для распознавания жеста разблокировки.";

@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Baby Lock";
+"NSInputMonitoringUsageDescription" = "Baby Lock utilise la surveillance des entrées uniquement pour reconnaître le geste de déverrouillage.";

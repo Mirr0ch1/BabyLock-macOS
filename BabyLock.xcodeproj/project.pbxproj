@@ -1,0 +1,497 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		000000000000000000001201 /* BabyLockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001101 /* BabyLockApp.swift */; };
+		000000000000000000001202 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001102 /* AppDelegate.swift */; };
+		000000000000000000001203 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001103 /* MenuBarController.swift */; };
+		000000000000000000001204 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001104 /* SettingsWindowController.swift */; };
+		000000000000000000001205 /* PreferencesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001105 /* PreferencesStore.swift */; };
+		000000000000000000001206 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001106 /* PermissionManager.swift */; };
+		000000000000000000001207 /* InputBlocker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001107 /* InputBlocker.swift */; };
+		000000000000000000001208 /* PointerDeviceSeizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001108 /* PointerDeviceSeizer.swift */; };
+		000000000000000000001209 /* CursorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001109 /* CursorController.swift */; };
+		000000000000000000001210 /* OverlayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001110 /* OverlayManager.swift */; };
+		000000000000000000001211 /* LockModeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001111 /* LockModeManager.swift */; };
+		000000000000000000001212 /* LockModeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001112 /* LockModeState.swift */; };
+		000000000000000000001213 /* OnboardingStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001113 /* OnboardingStep.swift */; };
+		000000000000000000001214 /* AutoUnlockDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001114 /* AutoUnlockDuration.swift */; };
+		000000000000000000001215 /* BlackoutScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001115 /* BlackoutScope.swift */; };
+		000000000000000000001216 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001116 /* Localization.swift */; };
+		000000000000000000001217 /* LockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001117 /* LockOverlayView.swift */; };
+		000000000000000000001218 /* AnimatedLockIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001118 /* AnimatedLockIcon.swift */; };
+		000000000000000000001219 /* LockHUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001119 /* LockHUDView.swift */; };
+		000000000000000000001220 /* StatusIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001120 /* StatusIcon.swift */; };
+		000000000000000000001221 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001121 /* OnboardingView.swift */; };
+		000000000000000000001222 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001122 /* SettingsView.swift */; };
+		000000000000000000001223 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001124 /* AppIcon.icns */; };
+		000000000000000000001224 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001401 /* InfoPlist.strings */; };
+		000000000000000000001225 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001402 /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		000000000000000000001001 /* Baby Lock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Baby Lock.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		000000000000000000001101 /* BabyLockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyLockApp.swift; sourceTree = "<group>"; };
+		000000000000000000001102 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		000000000000000000001103 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		000000000000000000001104 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
+		000000000000000000001105 /* PreferencesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesStore.swift; sourceTree = "<group>"; };
+		000000000000000000001106 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
+		000000000000000000001107 /* InputBlocker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputBlocker.swift; sourceTree = "<group>"; };
+		000000000000000000001108 /* PointerDeviceSeizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointerDeviceSeizer.swift; sourceTree = "<group>"; };
+		000000000000000000001109 /* CursorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorController.swift; sourceTree = "<group>"; };
+		000000000000000000001110 /* OverlayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayManager.swift; sourceTree = "<group>"; };
+		000000000000000000001111 /* LockModeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockModeManager.swift; sourceTree = "<group>"; };
+		000000000000000000001112 /* LockModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockModeState.swift; sourceTree = "<group>"; };
+		000000000000000000001113 /* OnboardingStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStep.swift; sourceTree = "<group>"; };
+		000000000000000000001114 /* AutoUnlockDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoUnlockDuration.swift; sourceTree = "<group>"; };
+		000000000000000000001115 /* BlackoutScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackoutScope.swift; sourceTree = "<group>"; };
+		000000000000000000001116 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		000000000000000000001117 /* LockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockOverlayView.swift; sourceTree = "<group>"; };
+		000000000000000000001118 /* AnimatedLockIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedLockIcon.swift; sourceTree = "<group>"; };
+		000000000000000000001119 /* LockHUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockHUDView.swift; sourceTree = "<group>"; };
+		000000000000000000001120 /* StatusIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIcon.swift; sourceTree = "<group>"; };
+		000000000000000000001121 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		000000000000000000001122 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		000000000000000000001123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		000000000000000000001124 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		000000000000000000001125 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		000000000000000000001126 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		000000000000000000001127 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		000000000000000000001128 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		000000000000000000001129 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		000000000000000000001130 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		000000000000000000001131 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		000000000000000000001132 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		000000000000000000001133 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		000000000000000000001134 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		000000000000000000001503 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		000000000000000000001300 = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001301 /* BabyLock */,
+				000000000000000000001308 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		000000000000000000001301 /* BabyLock */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001302 /* App */,
+				000000000000000000001303 /* Controllers */,
+				000000000000000000001304 /* Managers */,
+				000000000000000000001305 /* Models */,
+				000000000000000000001306 /* Views */,
+				000000000000000000001307 /* Resources */,
+			);
+			path = BabyLock;
+			sourceTree = "<group>";
+		};
+		000000000000000000001302 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001101 /* BabyLockApp.swift */,
+				000000000000000000001102 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		000000000000000000001303 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001103 /* MenuBarController.swift */,
+				000000000000000000001104 /* SettingsWindowController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		000000000000000000001304 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001105 /* PreferencesStore.swift */,
+				000000000000000000001106 /* PermissionManager.swift */,
+				000000000000000000001111 /* LockModeManager.swift */,
+				000000000000000000001107 /* InputBlocker.swift */,
+				000000000000000000001108 /* PointerDeviceSeizer.swift */,
+				000000000000000000001109 /* CursorController.swift */,
+				000000000000000000001110 /* OverlayManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		000000000000000000001305 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001112 /* LockModeState.swift */,
+				000000000000000000001113 /* OnboardingStep.swift */,
+				000000000000000000001114 /* AutoUnlockDuration.swift */,
+				000000000000000000001115 /* BlackoutScope.swift */,
+				000000000000000000001116 /* Localization.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		000000000000000000001306 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001117 /* LockOverlayView.swift */,
+				000000000000000000001119 /* LockHUDView.swift */,
+				000000000000000000001118 /* AnimatedLockIcon.swift */,
+				000000000000000000001120 /* StatusIcon.swift */,
+				000000000000000000001121 /* OnboardingView.swift */,
+				000000000000000000001122 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		000000000000000000001307 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001123 /* Info.plist */,
+				000000000000000000001401 /* InfoPlist.strings */,
+				000000000000000000001402 /* Localizable.strings */,
+				000000000000000000001124 /* AppIcon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		000000000000000000001308 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				000000000000000000001001 /* Baby Lock.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		000000000000000000001501 /* BabyLock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 000000000000000000001506 /* Build configuration list for PBXNativeTarget "BabyLock" */;
+			buildPhases = (
+				000000000000000000001502 /* Sources */,
+				000000000000000000001503 /* Frameworks */,
+				000000000000000000001504 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BabyLock;
+			productName = "Baby Lock";
+			productReference = 000000000000000000001001 /* Baby Lock.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		000000000000000000001500 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2600;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					000000000000000000001501 = {
+						CreatedOnToolsVersion = 26.0;
+					};
+				};
+			};
+			buildConfigurationList = 000000000000000000001505 /* Build configuration list for PBXProject "BabyLock" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+				"zh-Hant",
+				fr,
+				ru,
+				Base,
+			);
+			mainGroup = 000000000000000000001300;
+			productRefGroup = 000000000000000000001308 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				000000000000000000001501 /* BabyLock */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		000000000000000000001504 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000001223 /* AppIcon.icns in Resources */,
+				000000000000000000001224 /* InfoPlist.strings in Resources */,
+				000000000000000000001225 /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		000000000000000000001502 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				000000000000000000001201 /* BabyLockApp.swift in Sources */,
+				000000000000000000001202 /* AppDelegate.swift in Sources */,
+				000000000000000000001203 /* MenuBarController.swift in Sources */,
+				000000000000000000001204 /* SettingsWindowController.swift in Sources */,
+				000000000000000000001205 /* PreferencesStore.swift in Sources */,
+				000000000000000000001206 /* PermissionManager.swift in Sources */,
+				000000000000000000001207 /* InputBlocker.swift in Sources */,
+				000000000000000000001208 /* PointerDeviceSeizer.swift in Sources */,
+				000000000000000000001209 /* CursorController.swift in Sources */,
+				000000000000000000001210 /* OverlayManager.swift in Sources */,
+				000000000000000000001211 /* LockModeManager.swift in Sources */,
+				000000000000000000001212 /* LockModeState.swift in Sources */,
+				000000000000000000001213 /* OnboardingStep.swift in Sources */,
+				000000000000000000001214 /* AutoUnlockDuration.swift in Sources */,
+				000000000000000000001215 /* BlackoutScope.swift in Sources */,
+				000000000000000000001216 /* Localization.swift in Sources */,
+				000000000000000000001217 /* LockOverlayView.swift in Sources */,
+				000000000000000000001218 /* AnimatedLockIcon.swift in Sources */,
+				000000000000000000001219 /* LockHUDView.swift in Sources */,
+				000000000000000000001220 /* StatusIcon.swift in Sources */,
+				000000000000000000001221 /* OnboardingView.swift in Sources */,
+				000000000000000000001222 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		000000000000000000001401 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				000000000000000000001125 /* en */,
+				000000000000000000001126 /* zh-Hans */,
+				000000000000000000001127 /* zh-Hant */,
+				000000000000000000001128 /* fr */,
+				000000000000000000001129 /* ru */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		000000000000000000001402 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				000000000000000000001130 /* en */,
+				000000000000000000001131 /* zh-Hans */,
+				000000000000000000001132 /* zh-Hant */,
+				000000000000000000001133 /* fr */,
+				000000000000000000001134 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		000000000000000000001507 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ARCHS = "$(ARCHS_STANDARD)";
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		000000000000000000001508 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		000000000000000000001509 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_LANGUAGE = en;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BabyLock/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ARCHS = "$(ARCHS_STANDARD)";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mirr0ch1.babylock;
+				PRODUCT_NAME = "Baby Lock";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		000000000000000000001510 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_LANGUAGE = en;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BabyLock/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				ARCHS = "$(ARCHS_STANDARD)";
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mirr0ch1.babylock;
+				PRODUCT_NAME = "Baby Lock";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		000000000000000000001505 /* Build configuration list for PBXProject "BabyLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000001507 /* Debug */,
+				000000000000000000001508 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		000000000000000000001506 /* Build configuration list for PBXNativeTarget "BabyLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				000000000000000000001509 /* Debug */,
+				000000000000000000001510 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 000000000000000000001500 /* Project object */;
+}

@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Baby Lock";
+"NSInputMonitoringUsageDescription" = "Baby Lock uses Input Monitoring only to recognize the unlock gesture.";

@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Baby Lock";
+"NSInputMonitoringUsageDescription" = "Baby Lock 僅使用輸入監控權限來辨識解鎖手勢。";

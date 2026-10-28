@@ -1,10 +1,12 @@
 #!/bin/zsh
 set -euo pipefail
 
-/usr/bin/pkill CleanLock 2>/dev/null || true
-/usr/bin/defaults delete dev.cleanlock.CleanLock 2>/dev/null || true
-/usr/bin/tccutil reset Accessibility dev.cleanlock.CleanLock 2>/dev/null || true
-/usr/bin/tccutil reset ListenEvent dev.cleanlock.CleanLock 2>/dev/null || true
+BUNDLE_ID="com.mirr0ch1.babylock"
+
+/usr/bin/pkill -f "/Baby Lock.app/Contents/MacOS/Baby Lock" 2>/dev/null || true
+/usr/bin/defaults delete "$BUNDLE_ID" 2>/dev/null || true
+/usr/bin/tccutil reset Accessibility "$BUNDLE_ID" 2>/dev/null || true
+/usr/bin/tccutil reset ListenEvent "$BUNDLE_ID" 2>/dev/null || true
 /usr/bin/killall cfprefsd 2>/dev/null || true
 
-echo "CleanLock dev state reset"
+echo "Baby Lock dev state reset"

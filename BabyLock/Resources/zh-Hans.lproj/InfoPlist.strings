@@ -1,0 +1,2 @@
+"CFBundleDisplayName" = "Baby Lock";
+"NSInputMonitoringUsageDescription" = "Baby Lock 仅使用输入监控权限来识别解锁手势。";

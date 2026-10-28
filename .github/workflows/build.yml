@@ -1,0 +1,71 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: macOS universal build
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          sw_vers
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project BabyLock.xcodeproj \
+            -scheme BabyLock \
+            -configuration Release \
+            -derivedDataPath build \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build -quiet
+
+      - name: Sign ad hoc
+        run: |
+          APP="build/Build/Products/Release/Baby Lock.app"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          lipo -info "$APP/Contents/MacOS/Baby Lock"
+          plutil -p "$APP/Contents/Info.plist" | head -40
+
+      - name: Package
+        run: |
+          APP="build/Build/Products/Release/Baby Lock.app"
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "BabyLock-macOS.zip"
+          ls -lh BabyLock-macOS.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BabyLock-macOS
+          path: BabyLock-macOS.zip
+          if-no-files-found: error
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: BabyLock-macOS.zip
+          generate_release_notes: true
