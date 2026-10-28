@@ -41,6 +41,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         window.backgroundColor = .clear
         window.isOpaque = false
         window.isReleasedWhenClosed = false
+        window.isRestorable = false
         window.delegate = self
         center(window)
         return window

@@ -248,6 +248,7 @@ final class MenuBarController: NSObject {
         window.backgroundColor = .clear
         window.isOpaque = false
         window.isReleasedWhenClosed = false
+        window.isRestorable = false
         return window
     }
 
