@@ -311,7 +311,7 @@ final class OverlayManager {
         hostingController.view.layoutSubtreeIfNeeded()
 
         let fittingHeight = hostingController.view.fittingSize.height
-        return NSSize(width: Self.hudWidth, height: max(ceil(fittingHeight), 96))
+        return NSSize(width: Self.hudWidth, height: max(ceil(fittingHeight), 150))
     }
 
     private func makeHUDWindow(

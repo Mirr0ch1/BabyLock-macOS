@@ -96,6 +96,13 @@ final class PreferencesStore: ObservableObject {
         launchAtLoginEnabled = Self.isLaunchAtLoginEnabled
     }
 
+    /// Called when the system language may have changed while the app follows
+    /// the system. Forces SwiftUI views to re-read `appLanguage`.
+    func notifyLanguageMayHaveChanged() {
+        objectWillChange.send()
+        NotificationCenter.default.post(name: .appLanguageDidChange, object: self)
+    }
+
     func setLaunchAtLoginEnabled(_ isEnabled: Bool) {
         defaults.set(true, forKey: Keys.hasUserChangedLaunchAtLogin)
         guard isEnabled != launchAtLoginEnabled else { return }

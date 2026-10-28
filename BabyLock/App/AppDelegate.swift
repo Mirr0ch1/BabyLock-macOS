@@ -62,6 +62,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        NotificationCenter.default.post(name: .appLanguageDidChange, object: nil)
+        PreferencesStore.shared.notifyLanguageMayHaveChanged()
     }
 }
