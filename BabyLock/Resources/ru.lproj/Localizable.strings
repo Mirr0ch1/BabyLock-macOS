@@ -6,7 +6,7 @@
 "menu.checkForUpdates" = "Проверить обновления";
 "menu.checkingForUpdates" = "Проверка обновлений…";
 "menu.upToDate" = "Обновлений нет";
-"menu.updateAvailable" = "Доступно обновление — нажмите, чтобы установить";
+"menu.updateAvailable" = "Обновление %@ — установить";
 "menu.downloadingUpdate" = "Загрузка обновления…";
 "menu.installingUpdate" = "Установка обновления…";
 "menu.updateFailed" = "Не удалось проверить обновления";
@@ -25,9 +25,10 @@
 "settings.pointer" = "Блокировать трекпад и мышь";
 "settings.pointerSubtitle" = "Игнорировать клики, прокрутку и жесты, а также скрывать курсор.";
 "settings.exemption" = "Исключённая клавиша";
-"settings.exemptionSubtitle" = "Работает при блокировке, например 🌐 Fn для голосового ввода.";
+"settings.exemptionSubtitle" = "Работает при блокировке. Можно добавить несколько клавиш; для сочетания добавьте каждую клавишу отдельно (например, ⌃, C, V).";
 "settings.exemptionNone" = "Не задано";
 "settings.exemptionRecording" = "Нажмите клавишу…";
+"settings.exemptionAddKey" = "Добавить";
 "settings.exemptionClear" = "Очистить";
 "settings.exemptionLockedHint" = "Сначала разблокируйте, чтобы изменить.";
 "settings.exemptionBindFn" = "Привязать Fn";

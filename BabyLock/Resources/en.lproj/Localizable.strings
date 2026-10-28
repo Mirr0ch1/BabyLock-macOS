@@ -6,7 +6,7 @@
 "menu.checkForUpdates" = "Check for Updates";
 "menu.checkingForUpdates" = "Checking for Updates…";
 "menu.upToDate" = "No Updates Available";
-"menu.updateAvailable" = "Update Available — Click to Install";
+"menu.updateAvailable" = "Update %@ — Click to Install";
 "menu.downloadingUpdate" = "Downloading Update…";
 "menu.installingUpdate" = "Installing Update…";
 "menu.updateFailed" = "Update Check Failed";
@@ -25,9 +25,10 @@
 "settings.pointer" = "Block trackpad and mouse";
 "settings.pointerSubtitle" = "Ignore clicks, scrolling, and gestures, and hide the pointer.";
 "settings.exemption" = "Exempt shortcut";
-"settings.exemptionSubtitle" = "Keeps working while locked — for example the 🌐 Fn key for dictation.";
+"settings.exemptionSubtitle" = "Stays usable while locked. Add several keys; for a shortcut, add every key separately (e.g. ⌃, C, V).";
 "settings.exemptionNone" = "Not set";
 "settings.exemptionRecording" = "Press a key…";
+"settings.exemptionAddKey" = "Add key";
 "settings.exemptionClear" = "Clear";
 "settings.exemptionLockedHint" = "Unlock first to change it.";
 "settings.exemptionBindFn" = "Bind Fn key";

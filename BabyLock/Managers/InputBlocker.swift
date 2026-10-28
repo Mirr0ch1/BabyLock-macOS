@@ -45,8 +45,7 @@ final class InputBlocker {
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
     private var isPointerBlockingEnabled = true
-    private var exemption: InputExemption?
-    private var isExemptionKeyDown = false
+    private var exemptKeyCodes: Set<Int64> = []
     private var progressTimer: Timer?
     private var holdStartedAt: Date?
     private var isLeftCommandPressed = false
@@ -58,12 +57,14 @@ final class InputBlocker {
         stop()
     }
 
-    func start(blockPointer: Bool, exemption: InputExemption?) throws {
+    func start(blockPointer: Bool, exemptKeys: [ExemptKey]) throws {
         guard !isRunning else { return }
 
         resetState()
         isPointerBlockingEnabled = blockPointer
-        self.exemption = exemption
+        self.exemptKeyCodes = Set(
+            exemptKeys.flatMap { ExemptKey.equivalentKeyCodes(for: $0.keyCode) }
+        )
 
         var eventTypes: [CGEventType] = [
             .keyDown,
@@ -131,7 +132,7 @@ final class InputBlocker {
 
         isRunning = false
         isPointerBlockingEnabled = true
-        exemption = nil
+        exemptKeyCodes = []
         resetState()
         publish(.inactive)
     }
@@ -201,107 +202,13 @@ final class InputBlocker {
         return keyType != Self.powerKeyType
     }
 
-    /// Returns `true` when the event belongs to the user's exempted shortcut
-    /// and must reach macOS instead of being swallowed.
+    /// Returns `true` when the event belongs to a key the user exempted and
+    /// must reach macOS instead of being swallowed.
     private func shouldPassThrough(_ event: CGEvent) -> Bool {
-        guard let exemption else { return false }
+        guard !exemptKeyCodes.isEmpty else { return false }
 
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
-        let isGlobeExemption = exemption.keyCode == InputExemption.globeKeyCode
-            || exemption.keyCode == InputExemption.globeActionKeyCode
-
-        switch event.type {
-        case .keyDown:
-            if isGlobeExemption {
-                // macOS turns a hardware Globe tap into a synthetic keyDown
-                // with keycode 179; that event is what runs the configured
-                // Globe action. Pass it together with the Fn key itself.
-                return keyCode == InputExemption.globeKeyCode
-                    || keyCode == InputExemption.globeActionKeyCode
-            }
-
-            if exemption.kind == .modifier {
-                return keyCode == exemption.keyCode
-            }
-
-            guard keyCode == exemption.keyCode,
-                  Self.modifierFlagsMatch(event.flags, required: exemption.modifierFlags) else {
-                return false
-            }
-
-            isExemptionKeyDown = true
-            return true
-
-        case .keyUp:
-            if isGlobeExemption {
-                return keyCode == InputExemption.globeKeyCode
-                    || keyCode == InputExemption.globeActionKeyCode
-            }
-
-            if exemption.kind == .modifier {
-                return keyCode == exemption.keyCode
-            }
-
-            guard keyCode == exemption.keyCode else {
-                return false
-            }
-
-            // Modifiers may be released before the key itself. Once the
-            // matching keyDown reached the app, deliver the keyUp too so the
-            // app can never be left with a stuck key.
-            let shouldPass = isExemptionKeyDown
-                || Self.modifierFlagsMatch(event.flags, required: exemption.modifierFlags)
-            isExemptionKeyDown = false
-            return shouldPass
-
-        case .flagsChanged:
-            if isGlobeExemption {
-                return keyCode == InputExemption.globeKeyCode
-            }
-
-            if exemption.kind == .modifier {
-                return keyCode == exemption.keyCode
-            }
-
-            // Keep macOS' modifier state in sync for the modifiers that are
-            // part of the shortcut; otherwise the delivered keyDown can look
-            // like a bare key press to some apps.
-            return Self.modifierKeyCodes(for: exemption.modifierFlags).contains(keyCode)
-
-        default:
-            return false
-        }
-    }
-
-    private static func modifierFlagsMatch(_ flags: CGEventFlags, required: CGEventFlags) -> Bool {
-        flags.intersection(InputExemption.trackedModifierFlags)
-            == required.intersection(InputExemption.trackedModifierFlags)
-    }
-
-    private static func modifierKeyCodes(for flags: CGEventFlags) -> Set<Int64> {
-        var keyCodes: Set<Int64> = []
-
-        if flags.contains(.maskCommand) {
-            keyCodes.formUnion([54, 55])
-        }
-
-        if flags.contains(.maskShift) {
-            keyCodes.formUnion([56, 60])
-        }
-
-        if flags.contains(.maskAlternate) {
-            keyCodes.formUnion([58, 61])
-        }
-
-        if flags.contains(.maskControl) {
-            keyCodes.formUnion([59, 62])
-        }
-
-        if flags.contains(.maskSecondaryFn) {
-            keyCodes.insert(InputExemption.globeKeyCode)
-        }
-
-        return keyCodes
+        return exemptKeyCodes.contains(keyCode)
     }
 
     private func handleFlagsChanged(_ event: CGEvent) {
@@ -453,8 +360,6 @@ final class InputBlocker {
         isRightCommandPressed = false
         holdStartedAt = nil
         stateLock.unlock()
-
-        isExemptionKeyDown = false
     }
 
     private func publish(_ state: CommandKeyState) {

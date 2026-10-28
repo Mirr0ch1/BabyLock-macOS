@@ -11,9 +11,15 @@ struct OnboardingView: View {
     @State private var navigationDirection: NavigationDirection = .forward
 
     let onComplete: () -> Void
+    let onPreferredHeightChange: (CGFloat) -> Void
 
-    init(initialStep: OnboardingStep = .welcome, onComplete: @escaping () -> Void = {}) {
+    init(
+        initialStep: OnboardingStep = .welcome,
+        onPreferredHeightChange: @escaping (CGFloat) -> Void = { _ in },
+        onComplete: @escaping () -> Void = {}
+    ) {
         self._step = State(initialValue: initialStep)
+        self.onPreferredHeightChange = onPreferredHeightChange
         self.onComplete = onComplete
     }
 
@@ -35,6 +41,7 @@ struct OnboardingView: View {
         }
         .onAppear {
             permissions.checkPermissions()
+            onPreferredHeightChange(step.preferredContentHeight)
         }
         .onDisappear {
             unlockTest.stop()
@@ -44,6 +51,7 @@ struct OnboardingView: View {
         }
         .onChange(of: step) { newStep in
             handleStepChange(newStep)
+            onPreferredHeightChange(newStep.preferredContentHeight)
         }
     }
 

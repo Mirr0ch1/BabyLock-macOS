@@ -137,6 +137,7 @@ enum AppStrings {
         case settingsExemptionSubtitle = "settings.exemptionSubtitle"
         case settingsExemptionNone = "settings.exemptionNone"
         case settingsExemptionRecording = "settings.exemptionRecording"
+        case settingsExemptionAddKey = "settings.exemptionAddKey"
         case settingsExemptionClear = "settings.exemptionClear"
         case settingsExemptionLockedHint = "settings.exemptionLockedHint"
         case settingsExemptionBindFn = "settings.exemptionBindFn"

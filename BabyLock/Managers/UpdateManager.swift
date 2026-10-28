@@ -28,7 +28,7 @@ final class UpdateManager: ObservableObject {
     private let assetName = "BabyLock-macOS.zip"
 
     private var availableRelease: Release?
-    private var resetTask: Task<Void, Never>?
+    private var resetTimer: Timer?
     private var launchCheckTask: Task<Void, Never>?
     private var hasScheduledLaunchCheck = false
 
@@ -113,11 +113,11 @@ final class UpdateManager: ObservableObject {
         launchCheckTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             guard !Task.isCancelled else { return }
-            await self?.checkForUpdates(userInitiated: false)
+            self?.checkForUpdates(userInitiated: false)
         }
     }
 
-    func checkForUpdates(userInitiated: Bool) async {
+    func checkForUpdates(userInitiated: Bool) {
         switch state {
         case .checking, .downloading, .installing:
             return
@@ -125,10 +125,18 @@ final class UpdateManager: ObservableObject {
             break
         }
 
-        resetTask?.cancel()
-        resetTask = nil
+        // Set `.checking` synchronously so the menu row updates before the
+        // menu tracking loop gets another event.
+        resetTimer?.invalidate()
+        resetTimer = nil
         setState(.checking)
 
+        Task { @MainActor [weak self] in
+            await self?.performCheckForUpdates(userInitiated: userInitiated)
+        }
+    }
+
+    private func performCheckForUpdates(userInitiated: Bool) async {
         do {
             let release = try await fetchLatestRelease()
 
@@ -148,9 +156,12 @@ final class UpdateManager: ObservableObject {
             availableRelease = nil
 
             if userInitiated {
+                // Keep the feedback inside the open menu instead of covering
+                // it with a modal alert. The row resets itself after a few
+                // seconds so the user can retry.
+                NSLog("Baby Lock update check failed: \(error.localizedDescription)")
                 setState(.failed)
                 scheduleReset(after: 4, expected: .failed)
-                showErrorAlert(title: AppStrings.text(.updateCheckFailedTitle), error: error)
             } else {
                 // A launch-time check is best effort; stay quiet when offline.
                 setState(.idle)
@@ -463,12 +474,22 @@ final class UpdateManager: ObservableObject {
     }
 
     private func scheduleReset(after seconds: TimeInterval, expected: State) {
-        resetTask?.cancel()
-        resetTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-            guard let self, !Task.isCancelled, self.state == expected else { return }
-            self.setState(.idle)
+        resetTimer?.invalidate()
+
+        // Use a common-mode timer instead of `Task.sleep`: a menu stays open
+        // in NSEventTrackingRunLoopMode, where default-mode timers do not
+        // fire. The row must reset to “Check for Updates” while the menu is
+        // still open.
+        let timer = Timer(timeInterval: seconds, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.state == expected else { return }
+                self.resetTimer = nil
+                self.setState(.idle)
+            }
         }
+
+        RunLoop.main.add(timer, forMode: .common)
+        resetTimer = timer
     }
 
     private static func versionsMatch(_ lhs: String, _ rhs: String) -> Bool {

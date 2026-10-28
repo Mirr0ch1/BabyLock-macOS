@@ -56,7 +56,7 @@ Par défaut, le bureau reste exactement tel quel : pas d'écran noir, pas de cha
 
 ## Fonctionnalités
 
-- Bloque toutes les touches, y compris les raccourcis et les touches multimédia, avec un raccourci exempté facultatif (par exemple 🌐 Fn pour dicter).
+- Bloque toutes les touches, y compris les raccourcis et les touches multimédia ; gardez une ou plusieurs touches actives pendant le verrouillage (par exemple 🌐 Fn pour dicter, ou `⌃` + `C` + `V` pour copier-coller).
 - Vérifie les versions GitHub au lancement et depuis la barre des menus, puis télécharge, vérifie, installe et redémarre les mises à jour.
 - Peut bloquer les clics, le défilement et les gestes du trackpad/de la souris, et masquer le pointeur.
 - Déverrouillage avec `⌘` gauche + `⌘` droite maintenus 3 secondes, avec un anneau de progression.
@@ -102,7 +102,7 @@ Baby Lock a besoin de deux autorisations macOS :
 - **Accessibilité** — pour bloquer les événements du clavier et du pointeur pendant le verrouillage.
 - **Surveillance des entrées** — pour reconnaître le geste de déverrouillage avec les touches Commande.
 
-Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregistrées ni transmises. Le raccourci exempté facultatif est stocké dans vos préférences.
+Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregistrées ni transmises. Les touches exemptées facultatives sont stockées dans vos préférences.
 
 > La version étant signée ad hoc, macOS peut redemander les autorisations après le remplacement de l'app par une nouvelle version.
 
@@ -112,7 +112,7 @@ Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregis
 - **Langue** — suivre le système ou fixer l'une des cinq langues
 - **Déverrouillage automatique** — minuteur de sécurité (5 / 10 / 20 minutes)
 - **Bloquer le trackpad et la souris** — actif par défaut
-- **Raccourci exempté** — reste actif pendant le verrouillage, par ex. 🌐 Fn pour dicter ; utilisez **Lier la touche Fn** si une méthode de saisie l'intercepte
+- **Touches exemptées** — restent actives pendant le verrouillage ; ajoutez-en plusieurs. Pour un raccourci, ajoutez chaque touche séparément (par ex. `⌃`, `C`, `V`) ; utilisez **Lier Fn** si une méthode de saisie l'intercepte
 - **Écrans noirs** — désactivé par défaut, avec portée tous les écrans / écran principal
 - **Rechercher les mises à jour** (barre des menus) — vérifie les versions GitHub et installe la nouvelle version
 

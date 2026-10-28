@@ -100,7 +100,7 @@ final class LockModeManager: ObservableObject {
 
             try inputBlocker.start(
                 blockPointer: blockPointer,
-                exemption: preferences.inputExemption
+                exemptKeys: preferences.exemptKeys
             )
             scheduleAutoUnlockIfNeeded()
             state = .active

@@ -6,7 +6,7 @@
 "menu.checkForUpdates" = "檢查更新";
 "menu.checkingForUpdates" = "正在檢查更新…";
 "menu.upToDate" = "未偵測到更新";
-"menu.updateAvailable" = "有更新 — 點擊安裝";
+"menu.updateAvailable" = "有更新 %@ — 點擊安裝";
 "menu.downloadingUpdate" = "正在下載更新…";
 "menu.installingUpdate" = "正在安裝更新…";
 "menu.updateFailed" = "檢查更新失敗";
@@ -25,9 +25,10 @@
 "settings.pointer" = "鎖定觸控式軌跡板和滑鼠";
 "settings.pointerSubtitle" = "忽略點按、捲動和手勢，並隱藏指標。";
 "settings.exemption" = "豁免按鍵";
-"settings.exemptionSubtitle" = "鎖定期間仍可使用，例如用 🌐 Fn 鍵觸發語音輸入。";
+"settings.exemptionSubtitle" = "鎖定期間仍可使用。可新增多個按鍵；組合鍵需要把每個按鍵都加進來，例如 ⌃、C、V。";
 "settings.exemptionNone" = "未設定";
 "settings.exemptionRecording" = "請按下按鍵…";
+"settings.exemptionAddKey" = "新增按鍵";
 "settings.exemptionClear" = "清除";
 "settings.exemptionLockedHint" = "解鎖後才能修改。";
 "settings.exemptionBindFn" = "綁定 Fn 鍵";

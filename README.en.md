@@ -56,7 +56,7 @@ By default the desktop stays exactly as it is: no black screen, no app switching
 
 ## Features
 
-- Blocks every key, including shortcuts and media keys, with an optional exempt shortcut (for example 🌐 Fn for dictation).
+- Blocks every key, including shortcuts and media keys; keep one or more keys working while locked (for example 🌐 Fn for dictation, or `⌃` + `C` + `V` for copy and paste).
 - Checks GitHub Releases at launch and from the menu bar, downloads a verified update, installs it in place, and restarts.
 - Optionally blocks trackpad/mouse clicks, scrolling, and gestures, and hides the pointer.
 - Unlocks with `Left ⌘` + `Right ⌘` held for 3 seconds, with a progress ring.
@@ -102,7 +102,7 @@ Baby Lock needs two macOS permissions:
 - **Accessibility** — to block keyboard and pointer events while the lock is on.
 - **Input Monitoring** — to recognize the left/right Command unlock gesture.
 
-Both are used only locally. Keystrokes are never logged or transmitted. The optional exempt shortcut is stored in your preferences.
+Both are used only locally. Keystrokes are never logged or transmitted. The optional exempt keys are stored in your preferences.
 
 > The release is ad-hoc signed, so macOS may ask for permissions again after you replace the app with a new build.
 
@@ -112,7 +112,7 @@ Both are used only locally. Keystrokes are never logged or transmitted. The opti
 - **Language** — follow the system, or pin one of the five languages
 - **Auto-unlock** — safety timer (5 / 10 / 20 minutes)
 - **Block trackpad and mouse** — on by default
-- **Exempt shortcut** — stays usable while locked, e.g. 🌐 Fn for dictation; use **Bind Fn key** if another input method intercepts it
+- **Exempt keys** — stay usable while locked; add several keys. For a shortcut, add every key separately (e.g. `⌃`, `C`, `V`); use **Bind Fn key** if another input method intercepts Fn
 - **Black out displays** — off by default, with all-displays / main-display scope
 - **Check for Updates** (menu bar) — checks GitHub Releases, then downloads and installs a newer build
 

@@ -6,6 +6,7 @@ final class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private let lockModeManager: LockModeManager
     private let updateManager = UpdateManager.shared
+    private let updateMenuItemView = UpdateMenuItemView()
     private var onboardingWindow: NSWindow?
 
     init(lockModeManager: LockModeManager) {
@@ -21,7 +22,10 @@ final class MenuBarController: NSObject {
             self?.showOnboarding(initialStep: .permissions)
         }
         updateManager.onStateChange = { [weak self] in
-            self?.rebuildMenu()
+            self?.refreshUpdateMenuItem()
+        }
+        updateMenuItemView.onClick = { [weak self] in
+            self?.handleUpdateItemClick()
         }
         NotificationCenter.default.addObserver(
             self,
@@ -48,7 +52,12 @@ final class MenuBarController: NSObject {
             }
         }
 
-        let view = OnboardingView(initialStep: initialStep) { [weak self] in
+        let view = OnboardingView(
+            initialStep: initialStep,
+            onPreferredHeightChange: { [weak self] height in
+                self?.resizeOnboardingWindow(to: height)
+            }
+        ) { [weak self] in
             self?.onboardingWindow?.close()
             self?.onboardingWindow = nil
             self?.installStatusItemIfNeeded()
@@ -57,7 +66,7 @@ final class MenuBarController: NSObject {
 
         let window = makeWindow(
             title: "Baby Lock",
-            size: NSSize(width: 560, height: 540),
+            size: NSSize(width: 560, height: initialStep.preferredContentHeight),
             rootView: view
         )
         window.delegate = self
@@ -89,6 +98,7 @@ final class MenuBarController: NSObject {
         guard let statusItem else { return }
 
         let menu = NSMenu()
+        menu.autoenablesItems = false
 
         if lockModeManager.isLockActive {
             let activeItem = NSMenuItem(title: text(.menuLockEnabled), action: nil, keyEquivalent: "")
@@ -110,13 +120,12 @@ final class MenuBarController: NSObject {
         )
         menu.addItem(settingsItem)
 
-        let updateItem = NSMenuItem(
-            title: updateItemTitle,
-            action: #selector(handleUpdateItem),
-            keyEquivalent: ""
-        )
-        updateItem.isEnabled = updateManager.isMenuActionEnabled
+        let updateItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        updateItem.isEnabled = true
+        updateMenuItemView.removeFromSuperview()
+        updateItem.view = updateMenuItemView
         menu.addItem(updateItem)
+        refreshUpdateMenuItem()
 
         menu.addItem(NSMenuItem(
             title: text(.menuQuit),
@@ -144,17 +153,27 @@ final class MenuBarController: NSObject {
         SettingsWindowController.shared.show()
     }
 
-    @objc private func handleUpdateItem() {
+    @objc private func handleUpdateItemClick() {
         switch updateManager.state {
         case .updateAvailable:
-            updateManager.installAvailableUpdate()
+            // The confirmation alert is modal; close the menu first so it
+            // does not stay open behind the alert.
+            statusItem?.menu?.cancelTracking()
+            DispatchQueue.main.async { [weak self] in
+                self?.updateManager.installAvailableUpdate()
+            }
         case .checking, .downloading, .installing:
             break
         case .idle, .upToDate, .failed:
-            Task { @MainActor in
-                await updateManager.checkForUpdates(userInitiated: true)
-            }
+            updateManager.checkForUpdates(userInitiated: true)
         }
+    }
+
+    private func refreshUpdateMenuItem() {
+        updateMenuItemView.configure(
+            title: updateItemTitle,
+            isEnabled: updateManager.isMenuActionEnabled
+        )
     }
 
     private var updateItemTitle: String {
@@ -166,7 +185,10 @@ final class MenuBarController: NSObject {
         case .upToDate:
             return text(.menuUpToDate)
         case .updateAvailable(let version):
-            return text(.menuUpdateAvailable) + " v" + version
+            return String(
+                format: text(.menuUpdateAvailable),
+                "v" + version
+            )
         case .downloading:
             return text(.menuDownloadingUpdate)
         case .installing:
@@ -187,6 +209,23 @@ final class MenuBarController: NSObject {
 
     private func text(_ key: AppStrings.Key) -> String {
         AppStrings.text(key, language: PreferencesStore.shared.appLanguage)
+    }
+
+    /// The permission step has less content than the welcome and unlock
+    /// steps, so the onboarding window changes height as the user advances
+    /// instead of leaving a large empty area below the permission controls.
+    private func resizeOnboardingWindow(to contentHeight: CGFloat) {
+        guard let window = onboardingWindow else { return }
+
+        let currentHeight = window.contentRect(forFrameRect: window.frame).height
+        guard abs(currentHeight - contentHeight) > 0.5 else { return }
+
+        let oldFrame = window.frame
+        window.setContentSize(NSSize(width: 560, height: contentHeight))
+
+        var newFrame = window.frame
+        newFrame.origin.y = oldFrame.maxY - newFrame.height
+        window.setFrame(newFrame, display: true, animate: true)
     }
 
     private func makeWindow<Content: View>(
@@ -235,5 +274,160 @@ extension MenuBarController: NSWindowDelegate {
                 NSApp.setActivationPolicy(.accessory)
             }
         }
+    }
+}
+
+/// A menu row that behaves like a button without dismissing the menu.
+///
+/// A regular `NSMenuItem` closes the menu as soon as its action fires, which
+/// makes a multi-step update check (“checking…”, then “no updates”, then
+/// “check again”) impossible to show. A custom view keeps the menu open, so
+/// the row can update its own title while the user watches.
+@MainActor
+final class UpdateMenuItemView: NSView {
+    var onClick: (() -> Void)?
+
+    private let titleField = NSTextField(labelWithString: "")
+    private var isActionEnabled = true
+    private var isHovered = false {
+        didSet { updateAppearance() }
+    }
+    private var isPressed = false {
+        didSet { updateAppearance() }
+    }
+    private var trackingAreaReference: NSTrackingArea?
+
+    private let horizontalPadding: CGFloat = 14
+    private let preferredWidth: CGFloat = 280
+    private let preferredHeight: CGFloat = 22
+
+    init() {
+        super.init(frame: NSRect(x: 0, y: 0, width: preferredWidth, height: preferredHeight))
+
+        titleField.font = NSFont.menuFont(ofSize: 0)
+        titleField.lineBreakMode = .byTruncatingTail
+        titleField.isEditable = false
+        titleField.isSelectable = false
+        titleField.isBordered = false
+        titleField.drawsBackground = false
+        titleField.textColor = .labelColor
+        addSubview(titleField)
+
+        setAccessibilityElement(true)
+        setAccessibilityRole(.button)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override var intrinsicContentSize: NSSize {
+        NSSize(width: preferredWidth, height: preferredHeight)
+    }
+
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        let localPoint = convert(point, from: superview)
+        return bounds.contains(localPoint) ? self : nil
+    }
+
+    override func layout() {
+        super.layout()
+
+        let fieldHeight = titleField.intrinsicContentSize.height
+        titleField.frame = NSRect(
+            x: horizontalPadding,
+            y: (bounds.height - fieldHeight) / 2,
+            width: max(bounds.width - horizontalPadding - 12, 0),
+            height: fieldHeight
+        )
+    }
+
+    func configure(title: String, isEnabled: Bool) {
+        titleField.stringValue = title
+        isActionEnabled = isEnabled
+        setAccessibilityLabel(title)
+        needsLayout = true
+        updateAppearance()
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        if (isHovered || isPressed) && isActionEnabled {
+            NSColor.selectedContentBackgroundColor.setFill()
+            NSBezierPath(
+                roundedRect: bounds.insetBy(dx: 5, dy: 1),
+                xRadius: 4,
+                yRadius: 4
+            ).fill()
+        }
+
+        super.draw(dirtyRect)
+    }
+
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+
+        if window == nil {
+            isHovered = false
+            isPressed = false
+        }
+
+        updateTrackingAreas()
+    }
+
+    override func updateTrackingAreas() {
+        super.updateTrackingAreas()
+
+        if let trackingAreaReference {
+            removeTrackingArea(trackingAreaReference)
+        }
+
+        let area = NSTrackingArea(
+            rect: bounds,
+            options: [.mouseEnteredAndExited, .activeAlways, .inVisibleRect],
+            owner: self,
+            userInfo: nil
+        )
+        addTrackingArea(area)
+        trackingAreaReference = area
+    }
+
+    override func mouseEntered(with event: NSEvent) {
+        isHovered = true
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        isHovered = false
+        isPressed = false
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        guard isActionEnabled else { return }
+        isPressed = true
+    }
+
+    override func mouseUp(with event: NSEvent) {
+        guard isActionEnabled, isPressed else {
+            isPressed = false
+            return
+        }
+
+        let location = convert(event.locationInWindow, from: nil)
+        isPressed = false
+
+        if bounds.contains(location) {
+            onClick?()
+        }
+    }
+
+    private func updateAppearance() {
+        if !isActionEnabled {
+            titleField.textColor = .disabledControlTextColor
+        } else if isHovered || isPressed {
+            titleField.textColor = .selectedMenuItemTextColor
+        } else {
+            titleField.textColor = .labelColor
+        }
+
+        needsDisplay = true
     }
 }

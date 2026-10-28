@@ -63,8 +63,8 @@ struct SettingsView: View {
                         title: text(.settingsExemption),
                         subtitle: exemptionSubtitle
                     ) {
-                        ShortcutRecorderControl(
-                            exemption: $preferences.inputExemption,
+                        ExemptionKeysControl(
+                            keys: $preferences.exemptKeys,
                             isLocked: lockMode.isLockActive
                         )
                     }

@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import ServiceManagement
 
@@ -11,7 +12,8 @@ final class PreferencesStore: ObservableObject {
         static let blackoutEnabled = "blackoutEnabled"
         static let blackoutScope = "blackoutScope"
         static let blockPointerInput = "blockPointerInput"
-        static let inputExemption = "inputExemption"
+        static let exemptKeys = "exemptKeys"
+        static let legacyInputExemption = "inputExemption"
         static let languagePreference = "languagePreference"
         static let hasAppliedDefaultLaunchAtLoginPreference = "hasAppliedDefaultLaunchAtLoginPreference"
         static let hasUserChangedLaunchAtLogin = "hasUserChangedLaunchAtLogin"
@@ -51,17 +53,14 @@ final class PreferencesStore: ObservableObject {
         }
     }
 
-    /// A key or shortcut that stays usable while the keyboard is blocked.
-    /// `nil` means every key is blocked.
-    @Published var inputExemption: InputExemption? {
+    /// Keys that stay usable while the keyboard is blocked. An empty list
+    /// means every key is blocked. Shortcut keys must be added individually:
+    /// `⌃ + C` needs both `⌃` and `C` in the list.
+    @Published var exemptKeys: [ExemptKey] {
         didSet {
-            guard let inputExemption,
-                  let data = try? JSONEncoder().encode(inputExemption) else {
-                defaults.removeObject(forKey: Keys.inputExemption)
-                return
-            }
-
-            defaults.set(data, forKey: Keys.inputExemption)
+            guard let data = try? JSONEncoder().encode(exemptKeys) else { return }
+            defaults.set(data, forKey: Keys.exemptKeys)
+            defaults.removeObject(forKey: Keys.legacyInputExemption)
         }
     }
 
@@ -96,11 +95,20 @@ final class PreferencesStore: ObservableObject {
 
         self.blockPointerInput = defaults.object(forKey: Keys.blockPointerInput) as? Bool ?? true
 
-        if let data = defaults.data(forKey: Keys.inputExemption),
-           let exemption = try? JSONDecoder().decode(InputExemption.self, from: data) {
-            self.inputExemption = exemption
+        if let data = defaults.data(forKey: Keys.exemptKeys),
+           let keys = try? JSONDecoder().decode([ExemptKey].self, from: data) {
+            self.exemptKeys = keys
+        } else if let data = defaults.data(forKey: Keys.legacyInputExemption),
+                  let legacy = try? JSONDecoder().decode(LegacyInputExemption.self, from: data) {
+            let migrated = legacy.migratedKeys
+            self.exemptKeys = migrated
+
+            if let data = try? JSONEncoder().encode(migrated) {
+                defaults.set(data, forKey: Keys.exemptKeys)
+            }
+            defaults.removeObject(forKey: Keys.legacyInputExemption)
         } else {
-            self.inputExemption = nil
+            self.exemptKeys = []
         }
 
         var storedLanguage = defaults.string(forKey: Keys.languagePreference)
@@ -160,5 +168,46 @@ final class PreferencesStore: ObservableObject {
         } catch {
             NSLog("Failed to disable default launch at login: \(error.localizedDescription)")
         }
+    }
+}
+
+/// The old preference stored one key or shortcut. It is decoded only to move
+/// existing users to the multi-key list without losing their setting.
+private struct LegacyInputExemption: Decodable {
+    enum Kind: String, Decodable {
+        case key
+        case modifier
+    }
+
+    let kind: Kind
+    let keyCode: Int64
+    let modifiers: UInt64
+    let label: String
+
+    var migratedKeys: [ExemptKey] {
+        if keyCode == ExemptKey.globeKeyCode || keyCode == ExemptKey.globeActionKeyCode {
+            return [.globe]
+        }
+
+        var keys: [ExemptKey] = []
+
+        // A recorded shortcut used to imply its modifiers. Turn each of them
+        // into its own exempt key so the shortcut keeps working.
+        if kind == .key {
+            let flags = CGEventFlags(rawValue: modifiers)
+            for code in ExemptKey.modifierKeyCodes(for: flags).sorted() {
+                if let label = ExemptKey.modifierLabel(forKeyCode: code) {
+                    keys.append(ExemptKey(keyCode: code, label: label))
+                }
+            }
+        }
+
+        keys.append(ExemptKey(
+            keyCode: ExemptKey.canonicalKeyCode(keyCode),
+            label: label
+        ))
+
+        var seen: Set<Int64> = []
+        return keys.filter { seen.insert($0.keyCode).inserted }
     }
 }

@@ -6,7 +6,7 @@
 "menu.checkForUpdates" = "Rechercher les mises à jour";
 "menu.checkingForUpdates" = "Recherche de mises à jour…";
 "menu.upToDate" = "Aucune mise à jour disponible";
-"menu.updateAvailable" = "Mise à jour disponible — cliquez pour installer";
+"menu.updateAvailable" = "Mise à jour %@ — Installer";
 "menu.downloadingUpdate" = "Téléchargement de la mise à jour…";
 "menu.installingUpdate" = "Installation de la mise à jour…";
 "menu.updateFailed" = "Échec de la recherche de mise à jour";
@@ -25,12 +25,13 @@
 "settings.pointer" = "Bloquer le trackpad et la souris";
 "settings.pointerSubtitle" = "Ignorer les clics, le défilement et les gestes, et masquer le pointeur.";
 "settings.exemption" = "Raccourci exempté";
-"settings.exemptionSubtitle" = "Reste actif pendant le verrouillage, par exemple la touche 🌐 Fn pour dicter.";
+"settings.exemptionSubtitle" = "Reste utilisable pendant le verrouillage. Ajoutez plusieurs touches ; pour un raccourci, ajoutez chaque touche séparément (par ex. ⌃, C, V).";
 "settings.exemptionNone" = "Non défini";
 "settings.exemptionRecording" = "Appuyez sur une touche…";
+"settings.exemptionAddKey" = "Ajouter";
 "settings.exemptionClear" = "Effacer";
 "settings.exemptionLockedHint" = "Déverrouillez d'abord pour le modifier.";
-"settings.exemptionBindFn" = "Lier la touche Fn";
+"settings.exemptionBindFn" = "Lier Fn";
 "duration.fiveMinutes" = "5 minutes";
 "duration.tenMinutes" = "10 minutes";
 "duration.twentyMinutes" = "20 minutes";
