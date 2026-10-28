@@ -1,6 +1,20 @@
 import AppKit
 import SwiftUI
 
+/// Layout shared between the HUD view and the window that hosts it.
+enum HUDMetrics {
+    /// Width of the visible panel, excluding the transparent shadow gutter.
+    static let panelWidth: CGFloat = 560
+    /// Transparent margin around the panel. The SwiftUI shadow needs room to
+    /// fade out completely; without it the window edge clips the blur into a
+    /// hard ring.
+    static let shadowGutter: CGFloat = 72
+
+    static var windowWidth: CGFloat {
+        panelWidth + shadowGutter * 2
+    }
+}
+
 /// Compact, always-on-top hint used when the screen is not blacked out.
 /// It floats above the desktop without covering the screen or stealing focus.
 @MainActor
@@ -62,9 +76,9 @@ struct LockHUDView: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
+        .frame(width: HUDMetrics.panelWidth)
         .background(HUDChrome())
-        .padding(20)
-        .frame(width: 600)
+        .padding(HUDMetrics.shadowGutter)
         .opacity(state.showsContent ? 1 : 0)
         .offset(y: state.contentYOffset)
         .accessibilityElement(children: .combine)
@@ -95,7 +109,7 @@ private struct HUDChrome: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.12), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.32), radius: 18, x: 0, y: 8)
+        .shadow(color: Color.black.opacity(0.32), radius: 22, x: 0, y: 10)
     }
 }
 

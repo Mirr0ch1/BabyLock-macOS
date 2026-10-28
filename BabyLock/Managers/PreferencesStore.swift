@@ -11,6 +11,7 @@ final class PreferencesStore: ObservableObject {
         static let blackoutEnabled = "blackoutEnabled"
         static let blackoutScope = "blackoutScope"
         static let blockPointerInput = "blockPointerInput"
+        static let inputExemption = "inputExemption"
         static let languagePreference = "languagePreference"
         static let hasAppliedDefaultLaunchAtLoginPreference = "hasAppliedDefaultLaunchAtLoginPreference"
         static let hasUserChangedLaunchAtLogin = "hasUserChangedLaunchAtLogin"
@@ -50,6 +51,20 @@ final class PreferencesStore: ObservableObject {
         }
     }
 
+    /// A key or shortcut that stays usable while the keyboard is blocked.
+    /// `nil` means every key is blocked.
+    @Published var inputExemption: InputExemption? {
+        didSet {
+            guard let inputExemption,
+                  let data = try? JSONEncoder().encode(inputExemption) else {
+                defaults.removeObject(forKey: Keys.inputExemption)
+                return
+            }
+
+            defaults.set(data, forKey: Keys.inputExemption)
+        }
+    }
+
     @Published var languagePreference: LanguagePreference {
         didSet {
             defaults.set(languagePreference.rawValue, forKey: Keys.languagePreference)
@@ -80,6 +95,13 @@ final class PreferencesStore: ObservableObject {
             .flatMap(BlackoutScope.init(rawValue:)) ?? .allDisplays
 
         self.blockPointerInput = defaults.object(forKey: Keys.blockPointerInput) as? Bool ?? true
+
+        if let data = defaults.data(forKey: Keys.inputExemption),
+           let exemption = try? JSONDecoder().decode(InputExemption.self, from: data) {
+            self.inputExemption = exemption
+        } else {
+            self.inputExemption = nil
+        }
 
         var storedLanguage = defaults.string(forKey: Keys.languagePreference)
         if storedLanguage == nil {

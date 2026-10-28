@@ -17,6 +17,12 @@
 "settings.blackoutScopeSubtitle" = "Choose which displays turn black.";
 "settings.pointer" = "Block trackpad and mouse";
 "settings.pointerSubtitle" = "Ignore clicks, scrolling, and gestures, and hide the pointer.";
+"settings.exemption" = "Exempt shortcut";
+"settings.exemptionSubtitle" = "Keeps working while locked — for example the 🌐 Fn key for dictation.";
+"settings.exemptionNone" = "Not set";
+"settings.exemptionRecording" = "Press a key…";
+"settings.exemptionClear" = "Clear";
+"settings.exemptionLockedHint" = "Unlock first to change it.";
 "duration.fiveMinutes" = "5 minutes";
 "duration.tenMinutes" = "10 minutes";
 "duration.twentyMinutes" = "20 minutes";

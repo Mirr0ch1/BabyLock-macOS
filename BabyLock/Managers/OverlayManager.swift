@@ -17,6 +17,12 @@ enum OverlayError: LocalizedError {
 final class LockOverlayWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+
+    /// The HUD keeps a transparent shadow gutter around its panel and sits
+    /// slightly below the visible frame so that gutter stays off-screen.
+    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
+        frameRect
+    }
 }
 
 @MainActor
@@ -38,8 +44,7 @@ final class OverlayManager {
         let showsMainUI: Bool
     }
 
-    private static let hudWidth: CGFloat = 600
-    private static let hudBottomMargin: CGFloat = 30
+    private static let hudPanelBottomMargin: CGFloat = 30
 
     private(set) var isShowing = false
     private var records: [OverlayWindowRecord] = []
@@ -119,7 +124,9 @@ final class OverlayManager {
             let size = hudSize(for: hostingController)
             let origin = NSPoint(
                 x: mainScreen.visibleFrame.midX - size.width / 2,
-                y: mainScreen.visibleFrame.minY + Self.hudBottomMargin
+                y: mainScreen.visibleFrame.minY
+                    + Self.hudPanelBottomMargin
+                    - HUDMetrics.shadowGutter
             )
             let frame = NSRect(origin: origin, size: size)
             hostingController.view.frame = NSRect(origin: .zero, size: size)
@@ -306,12 +313,15 @@ final class OverlayManager {
     private func hudSize(for hostingController: NSHostingController<LockHUDView>) -> NSSize {
         hostingController.view.frame = NSRect(
             origin: .zero,
-            size: NSSize(width: Self.hudWidth, height: 160)
+            size: NSSize(width: HUDMetrics.windowWidth, height: 260)
         )
         hostingController.view.layoutSubtreeIfNeeded()
 
         let fittingHeight = hostingController.view.fittingSize.height
-        return NSSize(width: Self.hudWidth, height: max(ceil(fittingHeight), 150))
+        return NSSize(
+            width: HUDMetrics.windowWidth,
+            height: max(ceil(fittingHeight), HUDMetrics.shadowGutter * 2 + 96)
+        )
     }
 
     private func makeHUDWindow(

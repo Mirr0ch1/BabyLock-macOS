@@ -17,6 +17,12 @@
 "settings.blackoutScopeSubtitle" = "选择哪些屏幕变黑。";
 "settings.pointer" = "锁定触控板和鼠标";
 "settings.pointerSubtitle" = "忽略点击、滚动和手势，并隐藏指针。";
+"settings.exemption" = "豁免按键";
+"settings.exemptionSubtitle" = "锁定期间仍可使用，例如用 🌐 Fn 键触发语音输入。";
+"settings.exemptionNone" = "未设置";
+"settings.exemptionRecording" = "请按下按键…";
+"settings.exemptionClear" = "清除";
+"settings.exemptionLockedHint" = "解锁后才能修改。";
 "duration.fiveMinutes" = "5 分钟";
 "duration.tenMinutes" = "10 分钟";
 "duration.twentyMinutes" = "20 分钟";

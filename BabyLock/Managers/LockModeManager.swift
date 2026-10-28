@@ -98,7 +98,10 @@ final class LockModeManager: ObservableObject {
                 cursorController.hideAndFreezeCursor()
             }
 
-            try inputBlocker.start(blockPointer: blockPointer)
+            try inputBlocker.start(
+                blockPointer: blockPointer,
+                exemption: preferences.inputExemption
+            )
             scheduleAutoUnlockIfNeeded()
             state = .active
         } catch {

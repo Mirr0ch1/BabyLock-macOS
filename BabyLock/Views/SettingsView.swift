@@ -3,6 +3,7 @@ import SwiftUI
 @MainActor
 struct SettingsView: View {
     @ObservedObject private var preferences = PreferencesStore.shared
+    @ObservedObject private var lockMode = LockModeManager.shared
 
     var body: some View {
         ZStack {
@@ -59,6 +60,16 @@ struct SettingsView: View {
                     }
 
                     SettingsIslandRow(
+                        title: text(.settingsExemption),
+                        subtitle: exemptionSubtitle
+                    ) {
+                        ShortcutRecorderControl(
+                            exemption: $preferences.inputExemption,
+                            isLocked: lockMode.isLockActive
+                        )
+                    }
+
+                    SettingsIslandRow(
                         title: text(.settingsBlackout),
                         subtitle: text(.settingsBlackoutSubtitle)
                     ) {
@@ -93,7 +104,7 @@ struct SettingsView: View {
             }
             .padding(24)
         }
-        .frame(width: 560, height: 620)
+        .frame(width: 560, height: 700)
         .background(WindowTitleHider(extendsContentIntoTitlebar: true))
         .onAppear {
             preferences.refreshLaunchAtLoginStatus()
@@ -103,6 +114,16 @@ struct SettingsView: View {
 
     private func text(_ key: AppStrings.Key) -> String {
         AppStrings.text(key, language: preferences.appLanguage)
+    }
+
+    private var exemptionSubtitle: String {
+        let subtitle = text(.settingsExemptionSubtitle)
+
+        guard lockMode.isLockActive else {
+            return subtitle
+        }
+
+        return subtitle + " " + text(.settingsExemptionLockedHint)
     }
 
     private var launchAtLoginBinding: Binding<Bool> {

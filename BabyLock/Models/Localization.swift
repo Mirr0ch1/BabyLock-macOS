@@ -126,6 +126,12 @@ enum AppStrings {
         case settingsBlackoutScopeSubtitle = "settings.blackoutScopeSubtitle"
         case settingsPointer = "settings.pointer"
         case settingsPointerSubtitle = "settings.pointerSubtitle"
+        case settingsExemption = "settings.exemption"
+        case settingsExemptionSubtitle = "settings.exemptionSubtitle"
+        case settingsExemptionNone = "settings.exemptionNone"
+        case settingsExemptionRecording = "settings.exemptionRecording"
+        case settingsExemptionClear = "settings.exemptionClear"
+        case settingsExemptionLockedHint = "settings.exemptionLockedHint"
 
         // Durations
         case durationFiveMinutes = "duration.fiveMinutes"

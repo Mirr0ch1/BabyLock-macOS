@@ -29,6 +29,8 @@
 		000000000000000000001220 /* StatusIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001120 /* StatusIcon.swift */; };
 		000000000000000000001221 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001121 /* OnboardingView.swift */; };
 		000000000000000000001222 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001122 /* SettingsView.swift */; };
+		000000000000000000001226 /* InputExemption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001135 /* InputExemption.swift */; };
+		000000000000000000001227 /* ShortcutRecorderControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001136 /* ShortcutRecorderControl.swift */; };
 		000000000000000000001223 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001124 /* AppIcon.icns */; };
 		000000000000000000001224 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001401 /* InfoPlist.strings */; };
 		000000000000000000001225 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001402 /* Localizable.strings */; };
@@ -58,6 +60,8 @@
 		000000000000000000001120 /* StatusIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIcon.swift; sourceTree = "<group>"; };
 		000000000000000000001121 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		000000000000000000001122 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		000000000000000000001135 /* InputExemption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputExemption.swift; sourceTree = "<group>"; };
+		000000000000000000001136 /* ShortcutRecorderControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderControl.swift; sourceTree = "<group>"; };
 		000000000000000000001123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		000000000000000000001124 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		000000000000000000001125 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -144,6 +148,7 @@
 				000000000000000000001114 /* AutoUnlockDuration.swift */,
 				000000000000000000001115 /* BlackoutScope.swift */,
 				000000000000000000001116 /* Localization.swift */,
+				000000000000000000001135 /* InputExemption.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -157,6 +162,7 @@
 				000000000000000000001120 /* StatusIcon.swift */,
 				000000000000000000001121 /* OnboardingView.swift */,
 				000000000000000000001122 /* SettingsView.swift */,
+				000000000000000000001136 /* ShortcutRecorderControl.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -277,6 +283,8 @@
 				000000000000000000001220 /* StatusIcon.swift in Sources */,
 				000000000000000000001221 /* OnboardingView.swift in Sources */,
 				000000000000000000001222 /* SettingsView.swift in Sources */,
+				000000000000000000001226 /* InputExemption.swift in Sources */,
+				000000000000000000001227 /* ShortcutRecorderControl.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

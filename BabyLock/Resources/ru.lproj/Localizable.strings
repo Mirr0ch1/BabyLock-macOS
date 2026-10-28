@@ -17,6 +17,12 @@
 "settings.blackoutScopeSubtitle" = "Выберите, какие экраны затемнять.";
 "settings.pointer" = "Блокировать трекпад и мышь";
 "settings.pointerSubtitle" = "Игнорировать клики, прокрутку и жесты, а также скрывать курсор.";
+"settings.exemption" = "Исключённая клавиша";
+"settings.exemptionSubtitle" = "Работает при блокировке, например 🌐 Fn для голосового ввода.";
+"settings.exemptionNone" = "Не задано";
+"settings.exemptionRecording" = "Нажмите клавишу…";
+"settings.exemptionClear" = "Очистить";
+"settings.exemptionLockedHint" = "Сначала разблокируйте, чтобы изменить.";
 "duration.fiveMinutes" = "5 минут";
 "duration.tenMinutes" = "10 минут";
 "duration.twentyMinutes" = "20 минут";
