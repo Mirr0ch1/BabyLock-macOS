@@ -29,6 +29,9 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     private func makeWindow() -> NSWindow {
         let hostingController = NSHostingController(rootView: SettingsView())
+        // The settings window has a fixed size; do not let the hosting view's
+        // intrinsic content size override it.
+        hostingController.sizingOptions = []
         let window = NSWindow(contentViewController: hostingController)
         window.title = AppStrings.text(.settingsWindowTitle, language: PreferencesStore.shared.appLanguage)
         window.setContentSize(NSSize(width: 560, height: 700))

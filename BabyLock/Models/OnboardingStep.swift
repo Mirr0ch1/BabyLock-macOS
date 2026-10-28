@@ -9,14 +9,12 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
 
     var id: Int { rawValue }
 
-    /// The permissions step carries two compact permission rows and the
-    /// repair button; it needs less room than the centered welcome and
-    /// unlock-test steps. Sizing the window per step avoids the large empty
-    /// area that a single fixed height left under the permission controls.
+    /// Used as the initial window height before the permissions step reports
+    /// its measured height. The measured height replaces it immediately.
     var preferredContentHeight: CGFloat {
         switch self {
         case .permissions:
-            return 490
+            return 400
         case .welcome, .unlockTest, .completed:
             return 500
         }

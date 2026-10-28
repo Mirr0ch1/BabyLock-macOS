@@ -31,17 +31,28 @@ struct OnboardingView: View {
             ZStack {
                 content
                     .id(step)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear.preference(
+                                key: OnboardingContentHeightKey.self,
+                                value: proxy.size.height
+                            )
+                        }
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .transition(stepTransition)
             }
             .padding(.horizontal, 36)
-            .padding(.top, 34)
-            .padding(.bottom, 28)
+            .padding(.top, Self.contentTopPadding)
+            .padding(.bottom, Self.contentBottomPadding)
             .clipped()
         }
         .onAppear {
             permissions.checkPermissions()
-            onPreferredHeightChange(step.preferredContentHeight)
+
+            if step != .permissions {
+                onPreferredHeightChange(step.preferredContentHeight)
+            }
         }
         .onDisappear {
             unlockTest.stop()
@@ -51,9 +62,19 @@ struct OnboardingView: View {
         }
         .onChange(of: step) { newStep in
             handleStepChange(newStep)
-            onPreferredHeightChange(newStep.preferredContentHeight)
+
+            if newStep != .permissions {
+                onPreferredHeightChange(newStep.preferredContentHeight)
+            }
+        }
+        .onPreferenceChange(OnboardingContentHeightKey.self) { height in
+            guard step == .permissions, height > 0 else { return }
+            onPreferredHeightChange(height + Self.contentTopPadding + Self.contentBottomPadding)
         }
     }
+
+    private static let contentTopPadding: CGFloat = 34
+    private static let contentBottomPadding: CGFloat = 28
 
     private var stepTransition: AnyTransition {
         if reduceMotion {
@@ -199,8 +220,6 @@ struct OnboardingView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
-            Spacer()
-
             HStack {
                 Button(text(.onboardingBack)) {
                     retreat(to: .welcome)
@@ -216,6 +235,7 @@ struct OnboardingView: View {
                 .controlSize(.large)
                 .keyboardShortcut(.defaultAction)
             }
+            .padding(.top, 12)
         }
     }
 
@@ -370,6 +390,14 @@ private enum NavigationDirection {
         case .backward:
             return .trailing
         }
+    }
+}
+
+private struct OnboardingContentHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = max(value, nextValue())
     }
 }
 

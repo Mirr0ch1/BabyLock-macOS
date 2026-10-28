@@ -234,6 +234,11 @@ final class MenuBarController: NSObject {
         rootView: Content
     ) -> NSWindow {
         let hostingController = NSHostingController(rootView: rootView)
+        // The onboarding window manages its own height. Leaving the default
+        // sizing options on lets the hosting controller impose the SwiftUI
+        // view's intrinsic/minimum size, which overrides setContentSize and
+        // makes the permissions step much taller than its content.
+        hostingController.sizingOptions = []
         let window = NSWindow(contentViewController: hostingController)
         window.title = title
         window.setContentSize(size)
