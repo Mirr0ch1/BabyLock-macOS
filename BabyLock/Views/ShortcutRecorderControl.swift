@@ -62,12 +62,7 @@ final class ShortcutRecorder: ObservableObject {
             // the only way to record it.
             if event.keyCode == Int(InputExemption.globeKeyCode),
                event.modifierFlags.contains(.function) {
-                finish(InputExemption(
-                    kind: .modifier,
-                    keyCode: InputExemption.globeKeyCode,
-                    modifiers: 0,
-                    label: InputExemption.globeLabel
-                ))
+                finish(InputExemption.globePreset)
                 return nil
             }
 
@@ -88,12 +83,7 @@ final class ShortcutRecorder: ObservableObject {
         // keycode 179 action event. Normalize all of them.
         if event.keyCode == Int(InputExemption.globeKeyCode)
             || event.keyCode == Int(InputExemption.globeActionKeyCode) {
-            finish(InputExemption(
-                kind: .modifier,
-                keyCode: InputExemption.globeKeyCode,
-                modifiers: 0,
-                label: InputExemption.globeLabel
-            ))
+            finish(InputExemption.globePreset)
             return nil
         }
 
@@ -128,33 +118,48 @@ struct ShortcutRecorderControl: View {
     @ObservedObject private var preferences = PreferencesStore.shared
 
     var body: some View {
-        HStack(spacing: 8) {
-            Button {
-                recorder.toggle { recorded in
-                    exemption = recorded
+        VStack(alignment: .trailing, spacing: 6) {
+            HStack(spacing: 8) {
+                Button {
+                    recorder.toggle { recorded in
+                        exemption = recorded
+                    }
+                } label: {
+                    Text(title)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .frame(minWidth: 64)
                 }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .tint(recorder.isRecording ? Color.orange : Color.accentColor)
+
+                if exemption != nil && !recorder.isRecording {
+                    Button {
+                        exemption = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .imageScale(.medium)
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help(Text(text(.settingsExemptionClear)))
+                    .accessibilityLabel(Text(text(.settingsExemptionClear)))
+                }
+            }
+
+            // A direct preset is needed because some input methods and dictation
+            // tools consume the Globe key before an in-app key monitor sees it.
+            Button {
+                recorder.cancel()
+                exemption = InputExemption.globePreset
             } label: {
-                Text(title)
+                Text(text(.settingsExemptionBindFn))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-                    .frame(minWidth: 64)
+                    .minimumScaleFactor(0.8)
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-            .tint(recorder.isRecording ? Color.orange : Color.accentColor)
-
-            if exemption != nil && !recorder.isRecording {
-                Button {
-                    exemption = nil
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .imageScale(.medium)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .help(Text(text(.settingsExemptionClear)))
-                .accessibilityLabel(Text(text(.settingsExemptionClear)))
-            }
         }
         .frame(width: 176, alignment: .trailing)
         .disabled(isLocked)

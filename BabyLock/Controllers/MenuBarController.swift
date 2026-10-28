@@ -5,6 +5,7 @@ import SwiftUI
 final class MenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private let lockModeManager: LockModeManager
+    private let updateManager = UpdateManager.shared
     private var onboardingWindow: NSWindow?
 
     init(lockModeManager: LockModeManager) {
@@ -19,6 +20,9 @@ final class MenuBarController: NSObject {
         lockModeManager.onPermissionsRequired = { [weak self] in
             self?.showOnboarding(initialStep: .permissions)
         }
+        updateManager.onStateChange = { [weak self] in
+            self?.rebuildMenu()
+        }
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleLanguageChanged),
@@ -27,6 +31,7 @@ final class MenuBarController: NSObject {
         )
 
         installStatusItemIfNeeded()
+        updateManager.checkOnLaunch()
     }
 
     func showOnboarding(initialStep: OnboardingStep = .welcome) {
@@ -52,7 +57,7 @@ final class MenuBarController: NSObject {
 
         let window = makeWindow(
             title: "Baby Lock",
-            size: NSSize(width: 560, height: 500),
+            size: NSSize(width: 560, height: 540),
             rootView: view
         )
         window.delegate = self
@@ -105,6 +110,14 @@ final class MenuBarController: NSObject {
         )
         menu.addItem(settingsItem)
 
+        let updateItem = NSMenuItem(
+            title: updateItemTitle,
+            action: #selector(handleUpdateItem),
+            keyEquivalent: ""
+        )
+        updateItem.isEnabled = updateManager.isMenuActionEnabled
+        menu.addItem(updateItem)
+
         menu.addItem(NSMenuItem(
             title: text(.menuQuit),
             action: #selector(quitApplication),
@@ -129,6 +142,38 @@ final class MenuBarController: NSObject {
 
     @objc private func showSettings() {
         SettingsWindowController.shared.show()
+    }
+
+    @objc private func handleUpdateItem() {
+        switch updateManager.state {
+        case .updateAvailable:
+            updateManager.installAvailableUpdate()
+        case .checking, .downloading, .installing:
+            break
+        case .idle, .upToDate, .failed:
+            Task { @MainActor in
+                await updateManager.checkForUpdates(userInitiated: true)
+            }
+        }
+    }
+
+    private var updateItemTitle: String {
+        switch updateManager.state {
+        case .idle:
+            return text(.menuCheckForUpdates)
+        case .checking:
+            return text(.menuCheckingForUpdates)
+        case .upToDate:
+            return text(.menuUpToDate)
+        case .updateAvailable(let version):
+            return text(.menuUpdateAvailable) + " v" + version
+        case .downloading:
+            return text(.menuDownloadingUpdate)
+        case .installing:
+            return text(.menuInstallingUpdate)
+        case .failed:
+            return text(.menuUpdateFailed)
+        }
     }
 
     @objc private func quitApplication() {

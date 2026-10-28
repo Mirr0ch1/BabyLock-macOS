@@ -167,6 +167,26 @@ struct OnboardingView: View {
                 }
             )
 
+            if !permissions.isRunningFromApplications {
+                Text(text(.onboardingPermissionLocationWarning))
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                Button(text(.onboardingPermissionRepair)) {
+                    permissions.repairPermissionsAndRelaunch()
+                }
+                .controlSize(.small)
+                .disabled(!permissions.isRunningFromApplications)
+
+                Text(text(.onboardingPermissionRepairHint))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
             Text(text(.onboardingPrivacyNote))
                 .font(.footnote)
                 .foregroundStyle(.secondary)

@@ -41,6 +41,15 @@ struct InputExemption: Codable, Equatable {
     static let globeActionKeyCode: Int64 = 179
     static let globeLabel = "🌐 Fn"
 
+    static var globePreset: InputExemption {
+        InputExemption(
+            kind: .modifier,
+            keyCode: globeKeyCode,
+            modifiers: 0,
+            label: globeLabel
+        )
+    }
+
     /// Only these modifiers take part in matching. Caps Lock, the numeric pad
     /// and device-specific bits are deliberately ignored.
     static let trackedModifierFlags: CGEventFlags = [

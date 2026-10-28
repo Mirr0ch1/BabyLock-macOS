@@ -16,6 +16,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !hasCompletedOnboarding {
             menuBarController.showOnboarding()
         }
+
+        handlePendingPermissionPrompt()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -63,5 +65,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         PreferencesStore.shared.notifyLanguageMayHaveChanged()
+    }
+
+    private func handlePendingPermissionPrompt() {
+        guard PermissionManager.consumeNeedsPromptFlag() else { return }
+        guard PreferencesStore.shared.hasCompletedOnboarding else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
+            guard let self else { return }
+
+            PermissionManager.shared.checkPermissions()
+            guard !PermissionManager.shared.hasRequiredPermissions else { return }
+
+            self.menuBarController?.showOnboarding(initialStep: .permissions)
+            PermissionManager.shared.requestPermissionsAfterRepair()
+        }
     }
 }

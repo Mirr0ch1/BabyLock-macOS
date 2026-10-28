@@ -110,6 +110,13 @@ enum AppStrings {
         case menuLockEnabled = "menu.lockEnabled"
         case menuStartLock = "menu.startLock"
         case menuSettings = "menu.settings"
+        case menuCheckForUpdates = "menu.checkForUpdates"
+        case menuCheckingForUpdates = "menu.checkingForUpdates"
+        case menuUpToDate = "menu.upToDate"
+        case menuUpdateAvailable = "menu.updateAvailable"
+        case menuDownloadingUpdate = "menu.downloadingUpdate"
+        case menuInstallingUpdate = "menu.installingUpdate"
+        case menuUpdateFailed = "menu.updateFailed"
         case menuQuit = "menu.quit"
 
         // Settings
@@ -132,6 +139,7 @@ enum AppStrings {
         case settingsExemptionRecording = "settings.exemptionRecording"
         case settingsExemptionClear = "settings.exemptionClear"
         case settingsExemptionLockedHint = "settings.exemptionLockedHint"
+        case settingsExemptionBindFn = "settings.exemptionBindFn"
 
         // Durations
         case durationFiveMinutes = "duration.fiveMinutes"
@@ -164,6 +172,9 @@ enum AppStrings {
         case onboardingInputMonitoringTitle = "onboarding.inputMonitoringTitle"
         case onboardingInputMonitoringDescription = "onboarding.inputMonitoringDescription"
         case onboardingPrivacyNote = "onboarding.privacyNote"
+        case onboardingPermissionRepair = "onboarding.permissionRepair"
+        case onboardingPermissionRepairHint = "onboarding.permissionRepairHint"
+        case onboardingPermissionLocationWarning = "onboarding.permissionLocationWarning"
         case onboardingBack = "onboarding.back"
         case onboardingUnlockTestTitle = "onboarding.unlockTestTitle"
         case onboardingUnlockTestDescription = "onboarding.unlockTestDescription"
@@ -192,6 +203,23 @@ enum AppStrings {
 
         // Alerts
         case alertOK = "alert.ok"
+        case alertCancel = "alert.cancel"
+
+        // Updates
+        case updateConfirmTitle = "update.confirmTitle"
+        case updateConfirmMessage = "update.confirmMessage"
+        case updateInstallNow = "update.installNow"
+        case updateFailedTitle = "update.failedTitle"
+        case updateCheckFailedTitle = "update.checkFailedTitle"
+        case updateErrorNetwork = "update.errorNetwork"
+        case updateErrorMissingAsset = "update.errorMissingAsset"
+        case updateErrorInvalidArchive = "update.errorInvalidArchive"
+        case updateErrorVerification = "update.errorVerification"
+        case updateErrorSignature = "update.errorSignature"
+        case updateErrorNotInApplications = "update.errorNotInApplications"
+        case updateErrorNotWritable = "update.errorNotWritable"
+        case updateErrorLocked = "update.errorLocked"
+        case updateErrorProcess = "update.errorProcess"
     }
 
     static func text(_ key: Key, language: AppLanguage = .current) -> String {
