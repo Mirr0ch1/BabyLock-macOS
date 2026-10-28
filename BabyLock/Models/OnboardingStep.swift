@@ -16,7 +16,7 @@ enum OnboardingStep: Int, CaseIterable, Identifiable {
     var preferredContentHeight: CGFloat {
         switch self {
         case .permissions:
-            return 480
+            return 490
         case .welcome, .unlockTest, .completed:
             return 500
         }

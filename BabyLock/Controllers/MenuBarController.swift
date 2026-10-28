@@ -347,6 +347,7 @@ final class UpdateMenuItemView: NSView {
         isActionEnabled = isEnabled
         setAccessibilityLabel(title)
         needsLayout = true
+        titleField.needsDisplay = true
         updateAppearance()
     }
 
