@@ -212,9 +212,16 @@ final class UpdateManager: ObservableObject {
             }
 
             setState(.installing)
-            try prepareInstall(zipURL: zipURL, expectedVersion: release.version, tempRoot: tempRoot)
 
             UserDefaults.standard.set(true, forKey: "permissionsNeedPrompt")
+            _ = UserDefaults.standard.synchronize()
+
+            do {
+                try prepareInstall(zipURL: zipURL, expectedVersion: release.version, tempRoot: tempRoot)
+            } catch {
+                UserDefaults.standard.removeObject(forKey: "permissionsNeedPrompt")
+                throw error
+            }
 
             NSApp.terminate(nil)
         } catch {

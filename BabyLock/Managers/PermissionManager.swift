@@ -95,6 +95,7 @@ final class PermissionManager: ObservableObject {
         resetTCCEntry(service: "ListenEvent")
 
         UserDefaults.standard.set(true, forKey: Self.needsPromptKey)
+        _ = UserDefaults.standard.synchronize()
         relaunchApplication()
     }
 

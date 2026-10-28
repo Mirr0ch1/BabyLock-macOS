@@ -57,6 +57,7 @@ Par défaut, le bureau reste exactement tel quel : pas d'écran noir, pas de cha
 ## Fonctionnalités
 
 - Bloque toutes les touches, y compris les raccourcis et les touches multimédia, avec un raccourci exempté facultatif (par exemple 🌐 Fn pour dicter).
+- Vérifie les versions GitHub au lancement et depuis la barre des menus, puis télécharge, vérifie, installe et redémarre les mises à jour.
 - Peut bloquer les clics, le défilement et les gestes du trackpad/de la souris, et masquer le pointeur.
 - Déverrouillage avec `⌘` gauche + `⌘` droite maintenus 3 secondes, avec un anneau de progression.
 - Écran noir plein écran en option, désactivé par défaut ; tous les écrans ou l'écran principal uniquement.
@@ -64,7 +65,7 @@ Par défaut, le bureau reste exactement tel quel : pas d'écran noir, pas de cha
 - Application native de barre des menus (`LSUIElement`), sans icône dans le Dock.
 - Suit la langue du système, avec repli sur l'anglais.
 - Cinq langues : English, 简体中文, 繁體中文, Français, Русский.
-- Aucun accès réseau, aucune analyse, aucune journalisation des touches.
+- Aucune analyse ni journalisation des touches ; la seule requête réseau est la vérification des mises à jour GitHub.
 
 ## Différences avec CleanLock
 
@@ -111,8 +112,15 @@ Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregis
 - **Langue** — suivre le système ou fixer l'une des cinq langues
 - **Déverrouillage automatique** — minuteur de sécurité (5 / 10 / 20 minutes)
 - **Bloquer le trackpad et la souris** — actif par défaut
-- **Raccourci exempté** — reste actif pendant le verrouillage, par ex. 🌐 Fn pour dicter
+- **Raccourci exempté** — reste actif pendant le verrouillage, par ex. 🌐 Fn pour dicter ; utilisez **Lier la touche Fn** si une méthode de saisie l'intercepte
 - **Écrans noirs** — désactivé par défaut, avec portée tous les écrans / écran principal
+- **Rechercher les mises à jour** (barre des menus) — vérifie les versions GitHub et installe la nouvelle version
+
+## Mises à jour
+
+Baby Lock vérifie les versions GitHub au lancement. Utilisez **Rechercher les mises à jour** dans la barre des menus pour vérifier manuellement ; lorsqu'une version plus récente existe, l'élément affiche son numéro et l'installe après confirmation.
+
+La mise à jour est téléchargée depuis la version publiée, vérifiée, copiée à l'emplacement actuel de l'app, puis l'app redémarre automatiquement. Les versions publiées sont signées ad hoc : macOS peut donc demander de réautoriser Accessibilité et Surveillance des entrées après une mise à jour. Baby Lock ouvre l'écran des autorisations (avec un bouton de réinitialisation).
 
 ## Compilation
 

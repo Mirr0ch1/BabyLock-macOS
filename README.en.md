@@ -57,6 +57,7 @@ By default the desktop stays exactly as it is: no black screen, no app switching
 ## Features
 
 - Blocks every key, including shortcuts and media keys, with an optional exempt shortcut (for example 🌐 Fn for dictation).
+- Checks GitHub Releases at launch and from the menu bar, downloads a verified update, installs it in place, and restarts.
 - Optionally blocks trackpad/mouse clicks, scrolling, and gestures, and hides the pointer.
 - Unlocks with `Left ⌘` + `Right ⌘` held for 3 seconds, with a progress ring.
 - Optional full-screen blackout, off by default; all displays or main display only.
@@ -111,8 +112,15 @@ Both are used only locally. Keystrokes are never logged or transmitted. The opti
 - **Language** — follow the system, or pin one of the five languages
 - **Auto-unlock** — safety timer (5 / 10 / 20 minutes)
 - **Block trackpad and mouse** — on by default
-- **Exempt shortcut** — stays usable while locked, e.g. 🌐 Fn for dictation
+- **Exempt shortcut** — stays usable while locked, e.g. 🌐 Fn for dictation; use **Bind Fn key** if another input method intercepts it
 - **Black out displays** — off by default, with all-displays / main-display scope
+- **Check for Updates** (menu bar) — checks GitHub Releases, then downloads and installs a newer build
+
+## Updates
+
+Baby Lock checks GitHub Releases at launch. Use **Check for Updates** in the menu bar to check manually; when a newer version exists, the item shows the version and installs it after a confirmation.
+
+The update is downloaded from the release, verified, copied into the current app location, and the app restarts automatically. Release builds are ad-hoc signed, so macOS may ask you to re-authorize Accessibility and Input Monitoring after an update. Baby Lock opens the permission screen (with a reset button) for you.
 
 ## Build
 
