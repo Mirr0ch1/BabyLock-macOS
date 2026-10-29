@@ -31,6 +31,9 @@ final class UpdateManager: ObservableObject {
     private var resetTimer: Timer?
     private var launchCheckTask: Task<Void, Never>?
     private var hasScheduledLaunchCheck = false
+    /// Invalidates an in-flight silent launch check when the user starts a
+    /// visible check, so a late background response cannot overwrite it.
+    private var checkGeneration = 0
 
     private struct Release {
         let version: String
@@ -105,7 +108,9 @@ final class UpdateManager: ObservableObject {
         }
     }
 
-    /// Called once after the menu bar item is installed.
+    /// Called once after the menu bar item is installed. This check stays
+    /// invisible: it never switches the menu row to “checking”, and only
+    /// changes the row when a newer release actually exists.
     func checkOnLaunch() {
         guard !hasScheduledLaunchCheck else { return }
         hasScheduledLaunchCheck = true
@@ -113,7 +118,27 @@ final class UpdateManager: ObservableObject {
         launchCheckTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 3_000_000_000)
             guard !Task.isCancelled else { return }
-            self?.checkForUpdates(userInitiated: false)
+            await self?.performSilentLaunchCheck()
+        }
+    }
+
+    private func performSilentLaunchCheck() async {
+        guard state == .idle else { return }
+
+        let generation = checkGeneration
+
+        do {
+            let release = try await fetchLatestRelease()
+
+            guard generation == checkGeneration, state == .idle else { return }
+
+            if Self.isVersion(release.version, newerThan: currentVersion) {
+                availableRelease = release
+                setState(.updateAvailable(version: release.version))
+            }
+        } catch {
+            // A launch check is best effort. Leave the menu exactly as it is
+            // when the network is unavailable or there is no update.
         }
     }
 
@@ -123,6 +148,13 @@ final class UpdateManager: ObservableObject {
             return
         case .idle, .upToDate, .updateAvailable, .failed:
             break
+        }
+
+        if userInitiated {
+            // A visible check supersedes the silent launch check.
+            checkGeneration += 1
+            launchCheckTask?.cancel()
+            launchCheckTask = nil
         }
 
         // Set `.checking` synchronously so the menu row updates before the

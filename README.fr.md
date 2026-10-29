@@ -121,7 +121,7 @@ Si Réglages Système montre déjà les interrupteurs activés mais que Baby Loc
 
 ## Mises à jour
 
-Baby Lock vérifie les versions GitHub au lancement. Utilisez **Rechercher les mises à jour** dans la barre des menus pour vérifier manuellement :
+Baby Lock vérifie les versions GitHub au lancement. Cette vérification est silencieuse : sans mise à jour, le menu reste sur **Rechercher les mises à jour** ; seule une version plus récente modifie l'élément. Utilisez **Rechercher les mises à jour** dans la barre des menus pour vérifier manuellement :
 
 - le menu reste ouvert et affiche **Recherche de mises à jour…** ;
 - aucune mise à jour : **Aucune mise à jour disponible**, puis retour à **Rechercher les mises à jour** après trois secondes ;

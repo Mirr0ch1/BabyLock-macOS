@@ -3,10 +3,12 @@ import SwiftUI
 
 @MainActor
 final class MenuBarController: NSObject {
+    private static let updateItemTag = 1_001
+
     private var statusItem: NSStatusItem?
     private let lockModeManager: LockModeManager
     private let updateManager = UpdateManager.shared
-    private let updateMenuItemView = UpdateMenuItemView()
+    private var updateMenuItemView: UpdateMenuItemView?
     private var onboardingWindow: NSWindow?
 
     init(lockModeManager: LockModeManager) {
@@ -23,9 +25,6 @@ final class MenuBarController: NSObject {
         }
         updateManager.onStateChange = { [weak self] in
             self?.refreshUpdateMenuItem()
-        }
-        updateMenuItemView.onClick = { [weak self] in
-            self?.handleUpdateItemClick()
         }
         NotificationCenter.default.addObserver(
             self,
@@ -121,11 +120,11 @@ final class MenuBarController: NSObject {
         menu.addItem(settingsItem)
 
         let updateItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        updateItem.tag = Self.updateItemTag
         updateItem.isEnabled = true
-        updateMenuItemView.removeFromSuperview()
-        updateItem.view = updateMenuItemView
         menu.addItem(updateItem)
-        refreshUpdateMenuItem()
+        menu.delegate = self
+        installUpdateMenuItemView(in: menu)
 
         menu.addItem(NSMenuItem(
             title: text(.menuQuit),
@@ -170,10 +169,31 @@ final class MenuBarController: NSObject {
     }
 
     private func refreshUpdateMenuItem() {
-        updateMenuItemView.configure(
+        updateMenuItemView?.configure(
             title: updateItemTitle,
             isEnabled: updateManager.isMenuActionEnabled
         )
+    }
+
+    /// A menu item with a custom view can lose that view after repeated menu
+    /// opens. Replacing it with a fresh view on every open keeps the update
+    /// row from silently disappearing from the menu.
+    private func installUpdateMenuItemView(in menu: NSMenu) {
+        guard let item = menu.items.first(where: { $0.tag == Self.updateItemTag }) else {
+            return
+        }
+
+        let view = UpdateMenuItemView()
+        view.onClick = { [weak self] in
+            self?.handleUpdateItemClick()
+        }
+        view.configure(
+            title: updateItemTitle,
+            isEnabled: updateManager.isMenuActionEnabled
+        )
+
+        item.view = view
+        updateMenuItemView = view
     }
 
     private var updateItemTitle: String {
@@ -280,6 +300,13 @@ extension MenuBarController: NSWindowDelegate {
                 NSApp.setActivationPolicy(.accessory)
             }
         }
+    }
+}
+
+extension MenuBarController: NSMenuDelegate {
+    func menuWillOpen(_ menu: NSMenu) {
+        guard menu === statusItem?.menu else { return }
+        installUpdateMenuItemView(in: menu)
     }
 }
 

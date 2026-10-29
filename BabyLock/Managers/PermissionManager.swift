@@ -100,6 +100,9 @@ final class PermissionManager: ObservableObject {
     }
 
     /// Called on the first launch after a permission reset or an app update.
+    /// Triggers the macOS permission prompts and leaves System Settings to
+    /// the user. Opening the pane here as well produced two competing
+    /// prompts: the system alert plus a settings window on top of it.
     func requestPermissionsAfterRepair() {
         let options = [
             kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true
@@ -107,11 +110,6 @@ final class PermissionManager: ObservableObject {
         _ = AXIsProcessTrustedWithOptions(options)
         _ = IOHIDRequestAccess(kIOHIDRequestTypeListenEvent)
         checkPermissions()
-
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(nanoseconds: 600_000_000)
-            self?.openSystemSettingsForPermissions()
-        }
     }
 
     static func consumeNeedsPromptFlag() -> Bool {

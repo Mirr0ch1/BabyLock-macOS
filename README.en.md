@@ -121,7 +121,7 @@ If System Settings already shows the switches on but Baby Lock still says they a
 
 ## Updates
 
-Baby Lock checks GitHub Releases at launch. Use **Check for Updates** in the menu bar to check manually:
+Baby Lock checks GitHub Releases at launch. The launch check runs silently in the background: with no update, the menu stays on **Check for Updates**; only a newer release changes the item. Use **Check for Updates** in the menu bar to check manually:
 
 - the menu stays open and shows **Checking for Updates…**;
 - no update: **No Updates Available**, then it resets to **Check for Updates** after three seconds;
