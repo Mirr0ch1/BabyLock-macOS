@@ -140,6 +140,7 @@ The app must be in `/Applications` or `~/Applications` to install an update. Rel
 - Restarting, force-shutting down, or force-quitting does not restore the lock; the lock state lives in memory only.
 - The unlock gesture is shown on the HUD. A child who can read can learn it, so this is not a strong security lock against older children.
 - Keyboards without a right Command key cannot use the unlock gesture; wait for the auto-unlock timer or use the hardware power-button long press.
+- Force-quitting the app while locked may leave the cursor hidden or frozen; sleep/wake or logging in again usually restores it.
 - Other processes in the same user session, Voice Control, screen sharing, and MDM remote management are outside its protection.
 - Release builds are ad-hoc signed; macOS may ask for permissions again after the first install or an update.
 
