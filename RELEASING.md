@@ -119,6 +119,7 @@ The tag build uses `macos-15-intel` to avoid unreliable arm64 runner capacity.
 - runs with `contents: read` by default;
 - gives only the `release` job `contents: write`;
 - signs the zip with `BABYLOCK_UPDATE_SIGNING_KEY` on tag builds;
+- verifies the signature against the pinned public key before uploading;
 - publishes the zip, signature, and SHA256.
 
 A release published manually through the GitHub UI **will not have a valid

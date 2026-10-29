@@ -74,6 +74,16 @@ jobs:
           swift Scripts/sign-update.swift BabyLock-macOS.zip BabyLock-macOS.zip.sig
           shasum -a 256 -c BabyLock-macOS.zip.sha256
 
+      - name: Verify update signature
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.sign
+        run: |
+          PUBLIC_KEY="$(sed -n 's/.*publicKeyBase64 = "\([^"]*\)".*/\1/p' BabyLock/Managers/UpdateSigning.swift | head -1)"
+          if [ -z "$PUBLIC_KEY" ]; then
+            echo "could not read the pinned public key" >&2
+            exit 1
+          fi
+          swift Scripts/verify-update.swift BabyLock-macOS.zip BabyLock-macOS.zip.sig "$PUBLIC_KEY"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
