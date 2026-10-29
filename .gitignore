@@ -15,10 +15,15 @@ xcuserdata/
 *.xcarchive
 *.dSYM
 
-# Release artifacts
+# Release artifacts and local secrets
 BabyLock-macOS.zip
 BabyLock-macOS.zip.sig
 BabyLock-macOS.zip.sha256
+dist/
+.release-secrets/
+update-signing-key*
+*.pem
+*.key
 
 # Local tooling
 .env
