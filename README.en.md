@@ -56,7 +56,7 @@ By default the desktop stays exactly as it is: no black screen, no app switching
 
 ## Features
 
-- Blocks every key, including shortcuts and media keys; keep one or more keys working while locked (for example 🌐 Fn for dictation, or `⌃` + `C` + `V` for copy and paste).
+- Blocks every key, including shortcuts, media keys, and the short press of the power key; keep one or more keys working while locked (for example 🌐 Fn for dictation, or `⌃` + `C` + `V` for copy and paste).
 - Checks GitHub Releases at launch and from the menu bar, downloads a verified update, installs it in place, and restarts.
 - Resets and re-requests permissions from the permissions screen after an update or a stale grant.
 - Optionally blocks trackpad/mouse clicks, scrolling, and gestures, and hides the pointer.
@@ -94,6 +94,8 @@ Baby Lock started as a fork of [CleanLock](https://github.com/fromtimo/CleanLock
    xattr -dr com.apple.quarantine "/Applications/Baby Lock.app"
    ```
 
+   Download only from this project's [Releases](https://github.com/Mirr0ch1/BabyLock-macOS/releases) and check the `.sha256` and `.sig` files there; do not use third-party mirrors.
+
 5. Launch Baby Lock and complete the onboarding.
 
 ## Permissions
@@ -125,15 +127,26 @@ Baby Lock checks GitHub Releases at launch. The launch check runs silently in th
 
 - the menu stays open and shows **Checking for Updates…**;
 - no update: **No Updates Available**, then it resets to **Check for Updates** after three seconds;
-- update available: **Update vX.Y.Z — Click to Install**; after confirmation it downloads the release, verifies the bundle ID, version, and signature, replaces the app, resets permissions, and restarts.
+- update available: **Update vX.Y.Z — Click to Install**; after confirmation it downloads the release, verifies the Ed25519 signature, bundle ID, and version, replaces the app, resets permissions, and restarts.
+
+Update archives carry an Ed25519 signature. The app pins the public key; a missing or invalid signature is rejected and the current version is kept.
 
 The app must be in `/Applications` or `~/Applications` to install an update. Release builds are ad-hoc signed, so macOS may ask you to re-authorize Accessibility and Input Monitoring after an update. Baby Lock opens the permission screen and offers **Reset permissions and retry**.
+
+## Limitations
+
+- A short press of the power key is blocked while locked; holding the power button for 5–10 seconds still forces a shutdown as a hardware escape hatch.
+- Closing the lid or sleeping the Mac re-locks automatically on wake.
+- Restarting, force-shutting down, or force-quitting does not restore the lock; the lock state lives in memory only.
+- The unlock gesture is shown on the HUD. A child who can read can learn it, so this is not a strong security lock against older children.
+- Other processes in the same user session, Voice Control, screen sharing, and MDM remote management are outside its protection.
+- Release builds are ad-hoc signed; macOS may ask for permissions again after the first install or an update.
 
 ## Build
 
 ### GitHub Actions
 
-Every push to `main` and every `v*` tag builds a universal `arm64 + x86_64` app on a macOS runner, signs it ad hoc, and uploads `BabyLock-macOS.zip`. Tags also publish a GitHub release.
+Every push to `main` and every `v*` tag builds a universal `arm64 + x86_64` app on a macOS runner, signs it ad hoc, and uploads `BabyLock-macOS.zip`; tag builds also produce an Ed25519 signature and SHA256. Tags publish a GitHub release.
 
 ### Local development
 

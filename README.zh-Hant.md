@@ -56,7 +56,7 @@ Baby Lock 是中間方案：**Mac 繼續運作，螢幕保持可見，鍵盤暫�
 
 ## 功能
 
-- 封鎖所有按鍵，包括快速鍵和媒體鍵；可保留一個或多個豁免按鍵（例如用 🌐 Fn 觸發語音輸入，或新增 `⌃`、`C`、`V` 來保留複製貼上）。
+- 封鎖所有按鍵，包括快速鍵、媒體鍵和電源鍵短按；可保留一個或多個豁免按鍵（例如用 🌐 Fn 觸發語音輸入，或新增 `⌃`、`C`、`V` 來保留複製貼上）。
 - 啟動時和選單列中可檢查 GitHub Release 更新，自動下載、驗證、安裝並重新啟動。
 - 鎖定失效或更新後，可在權限頁一鍵重置權限並重新授權。
 - 可選擇封鎖觸控式軌跡板和滑鼠的點按、捲動、手勢，並隱藏指標。
@@ -94,6 +94,8 @@ Baby Lock 基於 [CleanLock](https://github.com/fromtimo/CleanLock) 改寫，保
    xattr -dr com.apple.quarantine "/Applications/Baby Lock.app"
    ```
 
+   只從本專案的 [Releases](https://github.com/Mirr0ch1/BabyLock-macOS/releases) 下載，並用 Release 裡的 `.sha256` 和 `.sig` 核對檔案；不要使用第三方轉載的安裝包。
+
 5. 啟動 Baby Lock，依照引導完成設定。
 
 ## 權限
@@ -125,15 +127,26 @@ Baby Lock 啟動時會檢查一次 GitHub Release。啟動檢查在背景靜默�
 
 - 選單會保持開啟，先顯示 **正在檢查更新…**；
 - 沒有更新：顯示 **未偵測到更新**，3 秒後自動恢復成 **檢查更新**；
-- 有更新：顯示 **有更新 vX.Y.Z — 點擊安裝**，確認後下載、驗證 bundle ID、版本號和簽名，替換目前的 App，重置權限並自動重新啟動。
+- 有更新：顯示 **有更新 vX.Y.Z — 點擊安裝**，確認後下載、驗證 Ed25519 簽名、bundle ID 和版本號，替換目前的 App，重置權限並自動重新啟動。
+
+更新包帶有 Ed25519 簽名；App 內建公鑰，簽名缺失或不相符時不會安裝，會保留目前版本。
 
 更新要求 App 位於 `/Applications` 或 `~/Applications`。由於發佈包使用 ad-hoc 臨時簽名，macOS 可能會在更新後要求重新授權；Baby Lock 會自動開啟權限介面，並提供「重置權限並重試」按鈕。
+
+## 限制
+
+- 鎖定期間會自動封鎖電源鍵短按；長按電源鍵 5–10 秒仍可強制關機，這是硬體逃生口。
+- 闔上螢幕或系統睡眠後，喚醒時會自動重新鎖定。
+- 重新啟動、強制關機或強退後不會恢復鎖定；鎖定狀態只保存在記憶體中。
+- 解鎖手勢會顯示在 HUD 上。會閱讀的孩子可以學會，因此它不是防大孩子的強安全鎖。
+- 同一使用者下的其他程式、Voice Control、螢幕共享、MDM 遠端管理等不受保護。
+- 發佈包是 ad-hoc 簽名；首次安裝或更新後，macOS 可能要求重新授權。
 
 ## 建置
 
 ### GitHub Actions
 
-推送到 `main` 或打 `v*` tag 時，會在 macOS runner 上建置 `arm64 + x86_64` 通用包，ad-hoc 簽名後上傳 `BabyLock-macOS.zip`。打 tag 還會自動建立 GitHub Release。
+推送到 `main` 或打 `v*` tag 時，會在 macOS runner 上建置 `arm64 + x86_64` 通用包，ad-hoc 簽名後上傳 `BabyLock-macOS.zip`；tag 建置還會產生 Ed25519 簽名和 SHA256，並自動建立 GitHub Release。
 
 ### 本機開發
 

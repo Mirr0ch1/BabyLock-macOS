@@ -37,7 +37,6 @@ final class InputBlocker {
     private static let sideCommandMask = leftCommandMask | rightCommandMask
     private static let systemDefinedEventType = CGEventType(rawValue: 14)!
     private static let auxControlButtonSubtype = 8
-    private static let powerKeyType = 6
 
     private let stateLock = NSLock()
     private let unlockDuration: TimeInterval = 3
@@ -189,17 +188,16 @@ final class InputBlocker {
         }
     }
 
+    /// Blocks every auxiliary control button, including the power key. A short
+    /// power press must not sleep the Mac and silently end the lock; holding
+    /// the hardware power button for several seconds still forces a shutdown
+    /// below the event-tap layer and remains the emergency exit.
     private func shouldBlockSystemDefinedEvent(_ event: CGEvent) -> Bool {
         guard let nsEvent = NSEvent(cgEvent: event) else {
             return false
         }
 
-        guard Int(nsEvent.subtype.rawValue) == Self.auxControlButtonSubtype else {
-            return false
-        }
-
-        let keyType = (nsEvent.data1 & 0xFFFF0000) >> 16
-        return keyType != Self.powerKeyType
+        return Int(nsEvent.subtype.rawValue) == Self.auxControlButtonSubtype
     }
 
     /// Returns `true` when the event belongs to a key the user exempted and
@@ -281,9 +279,15 @@ final class InputBlocker {
     private func startProgressTimerIfNeeded() {
         guard progressTimer == nil else { return }
 
-        progressTimer = Timer.scheduledTimer(withTimeInterval: 1 / 60, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 1 / 60, repeats: true) { [weak self] _ in
             self?.updateProgress()
         }
+
+        // The unlock gesture must keep working while a menu or a modal panel
+        // is tracking. A timer scheduled with `Timer.scheduledTimer` only runs
+        // in the default run-loop mode and would stall there.
+        RunLoop.main.add(timer, forMode: .common)
+        progressTimer = timer
     }
 
     private func stopProgressTimer(resetProgress: Bool) {

@@ -1,6 +1,41 @@
 import AppKit
 import Foundation
 
+private enum UpdateError: LocalizedError {
+    case network
+    case missingAsset
+    case invalidArchive
+    case verification
+    case signature
+    case notInApplications
+    case notWritable
+    case lockActive
+    case processFailed
+
+    var errorDescription: String? {
+        switch self {
+        case .network:
+            return AppStrings.text(.updateErrorNetwork)
+        case .missingAsset:
+            return AppStrings.text(.updateErrorMissingAsset)
+        case .invalidArchive:
+            return AppStrings.text(.updateErrorInvalidArchive)
+        case .verification:
+            return AppStrings.text(.updateErrorVerification)
+        case .signature:
+            return AppStrings.text(.updateErrorSignature)
+        case .notInApplications:
+            return AppStrings.text(.updateErrorNotInApplications)
+        case .notWritable:
+            return AppStrings.text(.updateErrorNotWritable)
+        case .lockActive:
+            return AppStrings.text(.updateErrorLocked)
+        case .processFailed:
+            return AppStrings.text(.updateErrorProcess)
+        }
+    }
+}
+
 /// Checks GitHub Releases for a newer build and installs it in place.
 ///
 /// The installer is a small detached shell script: it waits for this process
@@ -38,6 +73,7 @@ final class UpdateManager: ObservableObject {
     private struct Release {
         let version: String
         let downloadURL: URL
+        let signatureURL: URL?
     }
 
     private struct GitHubRelease: Decodable {
@@ -56,41 +92,6 @@ final class UpdateManager: ObservableObject {
             enum CodingKeys: String, CodingKey {
                 case name
                 case browserDownloadURL = "browser_download_url"
-            }
-        }
-    }
-
-    private enum UpdateError: LocalizedError {
-        case network
-        case missingAsset
-        case invalidArchive
-        case verification
-        case signature
-        case notInApplications
-        case notWritable
-        case lockActive
-        case processFailed
-
-        var errorDescription: String? {
-            switch self {
-            case .network:
-                return AppStrings.text(.updateErrorNetwork)
-            case .missingAsset:
-                return AppStrings.text(.updateErrorMissingAsset)
-            case .invalidArchive:
-                return AppStrings.text(.updateErrorInvalidArchive)
-            case .verification:
-                return AppStrings.text(.updateErrorVerification)
-            case .signature:
-                return AppStrings.text(.updateErrorSignature)
-            case .notInApplications:
-                return AppStrings.text(.updateErrorNotInApplications)
-            case .notWritable:
-                return AppStrings.text(.updateErrorNotWritable)
-            case .lockActive:
-                return AppStrings.text(.updateErrorLocked)
-            case .processFailed:
-                return AppStrings.text(.updateErrorProcess)
             }
         }
     }
@@ -205,10 +206,10 @@ final class UpdateManager: ObservableObject {
         guard case .updateAvailable(let version) = state,
               let release = availableRelease else { return }
 
-        guard !LockModeManager.shared.isLockActive else {
-            showErrorAlert(title: AppStrings.text(.updateFailedTitle), error: UpdateError.lockActive)
-            return
-        }
+        // The update row is not shown while locked, but keep the guard as a
+        // second line of defence: a modal alert over the screen-saver-level
+        // blackout would be invisible and would block the main thread.
+        guard !LockModeManager.shared.isLockActive else { return }
 
         let alert = NSAlert()
         alert.messageText = AppStrings.text(.updateConfirmTitle)
@@ -228,6 +229,20 @@ final class UpdateManager: ObservableObject {
     }
 
     private func downloadAndInstall(_ release: Release) async {
+        guard !LockModeManager.shared.isLockActive else { return }
+
+        guard let signatureURL = release.signatureURL else {
+            NSLog("Baby Lock update: release \(release.version) has no signature asset")
+            showErrorAlert(title: AppStrings.text(.updateFailedTitle), error: UpdateError.signature)
+            return
+        }
+
+        guard Self.isAllowedUpdateURL(release.downloadURL),
+              Self.isAllowedUpdateURL(signatureURL) else {
+            showErrorAlert(title: AppStrings.text(.updateFailedTitle), error: UpdateError.network)
+            return
+        }
+
         setState(.downloading)
 
         let tempRoot = FileManager.default.temporaryDirectory
@@ -243,12 +258,36 @@ final class UpdateManager: ObservableObject {
             let (downloadedURL, response) = try await URLSession.shared.download(for: request)
 
             guard let http = response as? HTTPURLResponse,
-                  (200..<300).contains(http.statusCode) else {
+                  (200..<300).contains(http.statusCode),
+                  let finalURL = http.url,
+                  Self.isAllowedUpdateURL(finalURL) else {
                 throw UpdateError.network
             }
 
             let zipURL = tempRoot.appendingPathComponent("BabyLock-macOS.zip")
             try FileManager.default.moveItem(at: downloadedURL, to: zipURL)
+
+            var signatureRequest = URLRequest(url: signatureURL)
+            signatureRequest.setValue("BabyLock/\(currentVersion)", forHTTPHeaderField: "User-Agent")
+            signatureRequest.timeoutInterval = 30
+
+            let (downloadedSignatureURL, signatureResponse) = try await URLSession.shared.download(for: signatureRequest)
+
+            guard let signatureHTTP = signatureResponse as? HTTPURLResponse,
+                  (200..<300).contains(signatureHTTP.statusCode),
+                  let finalSignatureURL = signatureHTTP.url,
+                  Self.isAllowedUpdateURL(finalSignatureURL) else {
+                throw UpdateError.signature
+            }
+
+            let localSignatureURL = tempRoot.appendingPathComponent("BabyLock-macOS.zip.sig")
+            try FileManager.default.moveItem(at: downloadedSignatureURL, to: localSignatureURL)
+
+            do {
+                try UpdateSigning.verify(zipURL: zipURL, signatureURL: localSignatureURL)
+            } catch {
+                throw UpdateError.signature
+            }
 
             guard !LockModeManager.shared.isLockActive else {
                 throw UpdateError.lockActive
@@ -260,10 +299,23 @@ final class UpdateManager: ObservableObject {
             _ = UserDefaults.standard.synchronize()
 
             do {
-                try prepareInstall(zipURL: zipURL, expectedVersion: release.version, tempRoot: tempRoot)
+                let expectedVersion = release.version
+                try await Task.detached(priority: .userInitiated) {
+                    try UpdateManager.prepareInstall(
+                        zipURL: zipURL,
+                        expectedVersion: expectedVersion,
+                        tempRoot: tempRoot
+                    )
+                }.value
             } catch {
                 UserDefaults.standard.removeObject(forKey: "permissionsNeedPrompt")
                 throw error
+            }
+
+            // The user may have started the lock while the update was being
+            // prepared. Do not terminate into a half-installed update.
+            guard !LockModeManager.shared.isLockActive else {
+                throw UpdateError.lockActive
             }
 
             NSApp.terminate(nil)
@@ -271,7 +323,12 @@ final class UpdateManager: ObservableObject {
             try? FileManager.default.removeItem(at: tempRoot)
             availableRelease = release
             setState(.updateAvailable(version: release.version))
-            showErrorAlert(title: AppStrings.text(.updateFailedTitle), error: error)
+
+            if LockModeManager.shared.isLockActive {
+                NSLog("Baby Lock update deferred while locked: \(error.localizedDescription)")
+            } else {
+                showErrorAlert(title: AppStrings.text(.updateFailedTitle), error: error)
+            }
         }
     }
 
@@ -313,21 +370,56 @@ final class UpdateManager: ObservableObject {
         let exactAsset = latest.assets.first {
             $0.name.caseInsensitiveCompare(assetName) == .orderedSame
         }
-        let asset = exactAsset ?? latest.assets.first {
-            $0.name.lowercased().hasSuffix(".zip")
-        }
 
-        guard let asset, let downloadURL = URL(string: asset.browserDownloadURL) else {
+        guard let asset = exactAsset,
+              let downloadURL = URL(string: asset.browserDownloadURL),
+              Self.isAllowedUpdateURL(downloadURL) else {
             throw UpdateError.missingAsset
         }
 
-        return Release(version: version, downloadURL: downloadURL)
+        let signatureName = assetName + ".sig"
+        let signatureAsset = latest.assets.first {
+            $0.name.caseInsensitiveCompare(signatureName) == .orderedSame
+        }
+
+        var signatureURL: URL?
+        if let signatureAsset {
+            guard let parsed = URL(string: signatureAsset.browserDownloadURL),
+                  Self.isAllowedUpdateURL(parsed) else {
+                throw UpdateError.signature
+            }
+            signatureURL = parsed
+        }
+
+        // Fail closed. An update without a signature must never be offered,
+        // even if the release otherwise looks newer.
+        if Self.isVersion(version, newerThan: currentVersion), signatureURL == nil {
+            throw UpdateError.signature
+        }
+
+        return Release(version: version, downloadURL: downloadURL, signatureURL: signatureURL)
     }
 
-    private func prepareInstall(zipURL: URL, expectedVersion: String, tempRoot: URL) throws {
+    /// Only GitHub-controlled HTTPS endpoints are accepted for the archive and
+    /// its detached signature. `URLSession` follows redirects, so the final
+    /// response URL is checked as well.
+    private nonisolated static func isAllowedUpdateURL(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased() else {
+            return false
+        }
+
+        return host == "github.com"
+            || host == "objects.githubusercontent.com"
+            || host == "release-assets.githubusercontent.com"
+            || host == "github-releases.githubusercontent.com"
+            || host.hasSuffix(".githubusercontent.com")
+    }
+
+    nonisolated private static func prepareInstall(zipURL: URL, expectedVersion: String, tempRoot: URL) throws {
         let extractDirectory = tempRoot.appendingPathComponent("extracted", isDirectory: true)
         try FileManager.default.createDirectory(at: extractDirectory, withIntermediateDirectories: true)
-        try runProcess("/usr/bin/ditto", ["-x", "-k", zipURL.path, extractDirectory.path])
+        try Self.runProcess("/usr/bin/ditto", ["-x", "-k", zipURL.path, extractDirectory.path])
 
         let extractedItems = try FileManager.default.contentsOfDirectory(
             at: extractDirectory,
@@ -336,6 +428,13 @@ final class UpdateManager: ObservableObject {
         let appBundles = extractedItems.filter { $0.pathExtension == "app" }
         guard let newAppURL = appBundles.first(where: { $0.lastPathComponent == "Baby Lock.app" })
                 ?? appBundles.first else {
+            throw UpdateError.invalidArchive
+        }
+
+        let extractPath = extractDirectory.standardizedFileURL.path + "/"
+        guard newAppURL.standardizedFileURL.path.hasPrefix(extractPath),
+              !Self.isSymbolicLink(newAppURL),
+              Self.containsNoSymlinks(newAppURL) else {
             throw UpdateError.invalidArchive
         }
 
@@ -352,8 +451,13 @@ final class UpdateManager: ObservableObject {
             throw UpdateError.verification
         }
 
+        if let minimumSystemVersion = info["LSMinimumSystemVersion"] as? String,
+           Self.isCurrentSystemOlder(than: minimumSystemVersion) {
+            throw UpdateError.verification
+        }
+
         do {
-            try runProcess("/usr/bin/codesign", ["--verify", "--deep", "--strict", newAppURL.path])
+            try Self.runProcess("/usr/bin/codesign", ["--verify", "--deep", "--strict", newAppURL.path])
         } catch {
             throw UpdateError.signature
         }
@@ -396,38 +500,65 @@ final class UpdateManager: ObservableObject {
         TEMP="$4"
         BACKUP="$5"
         BUNDLE_ID="$6"
+        EXPECTED="$7"
 
-        echo "[$(date)] update requested"
+        log() { echo "[$(/bin/date)] $*"; }
 
+        restore() {
+            /bin/rm -rf "$APP"
+            /bin/mv "$BACKUP" "$APP"
+            /usr/bin/open "$APP"
+        }
+
+        log "update requested"
+
+        TRIES=0
         while /bin/kill -0 "$PID" 2>/dev/null; do
             /bin/sleep 0.2
+            TRIES=$((TRIES + 1))
+            if [ "$TRIES" -ge 300 ]; then
+                log "app did not exit; aborting update"
+                /usr/bin/open "$APP"
+                exit 1
+            fi
         done
 
         /bin/rm -rf "$BACKUP"
 
         if ! /bin/mv "$APP" "$BACKUP"; then
-            echo "[$(date)] could not move the current app"
+            log "could not move the current app"
             /usr/bin/open "$APP"
             exit 1
         fi
 
         if /usr/bin/ditto "$NEW" "$APP"; then
+            if ! /usr/bin/codesign --verify --deep --strict "$APP"; then
+                log "copied app failed signature verification; restoring"
+                restore
+                exit 1
+            fi
+
+            INSTALLED_VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist" 2>/dev/null || true)
+            if [ "$INSTALLED_VERSION" != "$EXPECTED" ]; then
+                log "copied app version mismatch; restoring"
+                restore
+                exit 1
+            fi
+
             /usr/bin/xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
-            echo "[$(date)] installed new app"
+            log "installed new app"
 
             # Ad-hoc builds get a new signature, so TCC keeps a ghost entry for
             # the old binary. Clear it before the new app asks for access.
             /usr/bin/tccutil reset Accessibility "$BUNDLE_ID" >/dev/null 2>&1 || true
             /usr/bin/tccutil reset ListenEvent "$BUNDLE_ID" >/dev/null 2>&1 || true
 
-            echo "[$(date)] relaunching"
+            log "relaunching"
             /usr/bin/open "$APP"
             ( /bin/sleep 2; /bin/rm -rf "$TEMP" ) >/dev/null 2>&1 &
         else
-            echo "[$(date)] copy failed; restoring"
-            /bin/rm -rf "$APP"
-            /bin/mv "$BACKUP" "$APP"
-            /usr/bin/open "$APP"
+            log "copy failed; restoring"
+            restore
         fi
         """
 
@@ -449,7 +580,8 @@ final class UpdateManager: ObservableObject {
             String(ProcessInfo.processInfo.processIdentifier),
             tempRoot.path,
             backupURL.path,
-            Bundle.main.bundleIdentifier ?? "com.mirr0ch1.babylock"
+            Bundle.main.bundleIdentifier ?? "com.mirr0ch1.babylock",
+            expectedVersion
         ]
         process.standardOutput = logHandle
         process.standardError = logHandle
@@ -464,14 +596,40 @@ final class UpdateManager: ObservableObject {
         try? logHandle.close()
     }
 
-    private func runProcess(_ executable: String, _ arguments: [String]) throws {
+    /// Runs a helper process without ever blocking on a full pipe: both
+    /// streams go to a temporary file, and the wait has a timeout. The old
+    /// implementation called `waitUntilExit()` before reading the pipe, which
+    /// deadlocked as soon as the child produced more than the pipe buffer.
+    nonisolated private static func runProcess(
+        _ executable: String,
+        _ arguments: [String],
+        timeout: TimeInterval = 60
+    ) throws {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
 
-        let pipe = Pipe()
-        process.standardOutput = pipe
-        process.standardError = pipe
+        let outputURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("BabyLockProcess-\(UUID().uuidString).log")
+        FileManager.default.createFile(atPath: outputURL.path, contents: nil)
+
+        let handle: FileHandle
+        do {
+            handle = try FileHandle(forWritingTo: outputURL)
+        } catch {
+            throw UpdateError.processFailed
+        }
+
+        process.standardOutput = handle
+        process.standardError = handle
+
+        defer {
+            try? handle.close()
+            try? FileManager.default.removeItem(at: outputURL)
+        }
+
+        let semaphore = DispatchSemaphore(value: 0)
+        process.terminationHandler = { _ in semaphore.signal() }
 
         do {
             try process.run()
@@ -479,8 +637,14 @@ final class UpdateManager: ObservableObject {
             throw UpdateError.processFailed
         }
 
-        process.waitUntilExit()
-        let output = pipe.fileHandleForReading.readDataToEndOfFile()
+        if semaphore.wait(timeout: .now() + timeout) == .timedOut {
+            process.terminate()
+            _ = semaphore.wait(timeout: .now() + 5)
+            throw UpdateError.processFailed
+        }
+
+        try? handle.synchronize()
+        let output = (try? Data(contentsOf: outputURL)) ?? Data()
 
         guard process.terminationStatus == 0 else {
             if let text = String(data: output, encoding: .utf8), !text.isEmpty {
@@ -491,6 +655,11 @@ final class UpdateManager: ObservableObject {
     }
 
     private func showErrorAlert(title: String, error: Error) {
+        guard !LockModeManager.shared.isLockActive else {
+            NSLog("Baby Lock update error while locked: \(error.localizedDescription)")
+            return
+        }
+
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = error.localizedDescription
@@ -524,11 +693,11 @@ final class UpdateManager: ObservableObject {
         resetTimer = timer
     }
 
-    private static func versionsMatch(_ lhs: String, _ rhs: String) -> Bool {
+    private nonisolated static func versionsMatch(_ lhs: String, _ rhs: String) -> Bool {
         !isVersion(lhs, newerThan: rhs) && !isVersion(rhs, newerThan: lhs)
     }
 
-    private static func isVersion(_ candidate: String, newerThan current: String) -> Bool {
+    private nonisolated static func isVersion(_ candidate: String, newerThan current: String) -> Bool {
         let lhs = numericVersion(candidate)
         let rhs = numericVersion(current)
 
@@ -544,7 +713,7 @@ final class UpdateManager: ObservableObject {
         return false
     }
 
-    private static func numericVersion(_ raw: String) -> [Int] {
+    private nonisolated static func numericVersion(_ raw: String) -> [Int] {
         var value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if value.hasPrefix("v") || value.hasPrefix("V") {
@@ -557,9 +726,47 @@ final class UpdateManager: ObservableObject {
         }
     }
 
-    private static func isInstalledLocation(_ url: URL) -> Bool {
+    private nonisolated static func isInstalledLocation(_ url: URL) -> Bool {
         let path = url.standardizedFileURL.path
         return path.hasPrefix("/Applications/")
             || path.hasPrefix(NSHomeDirectory() + "/Applications/")
+    }
+
+    private nonisolated static func isSymbolicLink(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) == true
+    }
+
+    private nonisolated static func containsNoSymlinks(_ root: URL) -> Bool {
+        var failed = false
+
+        guard let enumerator = FileManager.default.enumerator(
+            at: root,
+            includingPropertiesForKeys: [.isSymbolicLinkKey],
+            options: [],
+            errorHandler: { _, _ in
+                failed = true
+                return false
+            }
+        ) else {
+            return false
+        }
+
+        for case let url as URL in enumerator {
+            if isSymbolicLink(url) {
+                return false
+            }
+        }
+
+        return !failed
+    }
+
+    private nonisolated static func isCurrentSystemOlder(than minimumVersion: String) -> Bool {
+        let components = minimumVersion.split(separator: ".").map { Int($0) ?? 0 }
+        let requiredMajor = components.isEmpty ? 0 : components[0]
+        let requiredMinor = components.count > 1 ? components[1] : 0
+
+        let current = ProcessInfo.processInfo.operatingSystemVersion
+        return current.majorVersion < requiredMajor
+            || (current.majorVersion == requiredMajor && current.minorVersion < requiredMinor)
     }
 }

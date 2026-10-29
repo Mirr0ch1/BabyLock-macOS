@@ -25,6 +25,11 @@ final class LockModeManager: ObservableObject {
     private let cursorController: CursorController
     private var autoUnlockTimer: Timer?
     private var unlockCompletionTask: Task<Void, Never>?
+    /// Set when the Mac sleeps while locked. The lock is stopped before sleep
+    /// so the event tap cannot survive in a half-disabled state, then restored
+    /// on wake. This closes the "close the lid to unlock" path without keeping
+    /// stale input state across a sleep.
+    private var shouldRelockAfterWake = false
 
     private convenience init() {
         self.init(
@@ -135,21 +140,30 @@ final class LockModeManager: ObservableObject {
     }
 
     func handleSystemWillSleep() {
+        guard state.isActive else { return }
+        shouldRelockAfterWake = true
         stopLockMode()
+    }
+
+    func handleSystemDidWake() {
+        guard shouldRelockAfterWake else { return }
+        shouldRelockAfterWake = false
+
+        guard preferences.hasCompletedOnboarding else { return }
+        startLockMode()
     }
 
     func handleDisplayConfigurationChanged() {
         guard state.isActive else { return }
 
-        // The HUD is a small panel and can simply stay where it is. Only the
-        // full-screen blackout depends on the display layout.
+        // The HUD is a small panel and can simply stay where it is. The
+        // full-screen blackout, however, must cover the new screen set.
+        // Re-enter the lock instead of leaving it off: unplugging a display
+        // must not be an unlock gesture.
         guard preferences.blackoutEnabled else { return }
 
         stopLockMode()
-        showMessage(
-            title: text(.errorLockDisabled),
-            message: text(.errorDisplayConfigurationChanged)
-        )
+        startLockMode()
     }
 
     private func handleCommandStateChanged(_ commandState: CommandKeyState) {

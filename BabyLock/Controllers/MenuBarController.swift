@@ -10,6 +10,12 @@ final class MenuBarController: NSObject {
     private let updateManager = UpdateManager.shared
     private var updateMenuItemView: UpdateMenuItemView?
     private var onboardingWindow: NSWindow?
+    /// The menu only depends on whether the lock is active, not on the
+    /// 60 Hz unlock progress. Comparing this prevents a full menu rebuild on
+    /// every progress tick while the user holds the two Command keys.
+    private var lastLockActive: Bool?
+    private var isMenuOpen = false
+    private var needsMenuRebuild = false
 
     init(lockModeManager: LockModeManager) {
         self.lockModeManager = lockModeManager
@@ -17,8 +23,8 @@ final class MenuBarController: NSObject {
     }
 
     func install() {
-        lockModeManager.onStateChange = { [weak self] _ in
-            self?.rebuildMenu()
+        lockModeManager.onStateChange = { [weak self] state in
+            self?.lockStateDidChange(state)
         }
         lockModeManager.onPermissionsRequired = { [weak self] in
             self?.showOnboarding(initialStep: .permissions)
@@ -34,7 +40,15 @@ final class MenuBarController: NSObject {
         )
 
         installStatusItemIfNeeded()
+        lastLockActive = lockModeManager.isLockActive
         updateManager.checkOnLaunch()
+    }
+
+    private func lockStateDidChange(_ state: LockModeState) {
+        let isActive = state.isActive
+        guard lastLockActive != isActive else { return }
+        lastLockActive = isActive
+        rebuildMenu()
     }
 
     func showOnboarding(initialStep: OnboardingStep = .welcome) {
@@ -96,20 +110,38 @@ final class MenuBarController: NSObject {
     private func rebuildMenu() {
         guard let statusItem else { return }
 
+        // Replacing the status item's menu while it is being tracked can
+        // close the menu or confuse AppKit. Defer the rebuild until it closes.
+        if isMenuOpen {
+            needsMenuRebuild = true
+            return
+        }
+
         let menu = NSMenu()
         menu.autoenablesItems = false
 
         if lockModeManager.isLockActive {
+            // While locked, management actions must not be reachable. In
+            // particular, quitting the app would stop the input tap and
+            // silently unlock the Mac when pointer blocking is disabled.
             let activeItem = NSMenuItem(title: text(.menuLockEnabled), action: nil, keyEquivalent: "")
             activeItem.isEnabled = false
             menu.addItem(activeItem)
-        } else {
-            menu.addItem(NSMenuItem(
-                title: text(.menuStartLock),
-                action: #selector(startLockMode),
-                keyEquivalent: ""
-            ))
+
+            let hintItem = NSMenuItem(title: text(.overlayExitInstruction), action: nil, keyEquivalent: "")
+            hintItem.isEnabled = false
+            menu.addItem(hintItem)
+
+            menu.delegate = self
+            statusItem.menu = menu
+            return
         }
+
+        menu.addItem(NSMenuItem(
+            title: text(.menuStartLock),
+            action: #selector(startLockMode),
+            keyEquivalent: ""
+        ))
 
         menu.addItem(.separator())
         let settingsItem = NSMenuItem(
@@ -149,10 +181,13 @@ final class MenuBarController: NSObject {
     }
 
     @objc private func showSettings() {
+        guard !lockModeManager.isLockActive else { return }
         SettingsWindowController.shared.show()
     }
 
     @objc private func handleUpdateItemClick() {
+        guard !lockModeManager.isLockActive else { return }
+
         switch updateManager.state {
         case .updateAvailable:
             // The confirmation alert is modal; close the menu first so it
@@ -219,6 +254,7 @@ final class MenuBarController: NSObject {
     }
 
     @objc private func quitApplication() {
+        guard !lockModeManager.isLockActive else { return }
         lockModeManager.stopLockMode()
         NSApp.terminate(nil)
     }
@@ -306,7 +342,17 @@ extension MenuBarController: NSWindowDelegate {
 extension MenuBarController: NSMenuDelegate {
     func menuWillOpen(_ menu: NSMenu) {
         guard menu === statusItem?.menu else { return }
+        isMenuOpen = true
         installUpdateMenuItemView(in: menu)
+    }
+
+    func menuDidClose(_ menu: NSMenu) {
+        isMenuOpen = false
+
+        if needsMenuRebuild {
+            needsMenuRebuild = false
+            rebuildMenu()
+        }
     }
 }
 
