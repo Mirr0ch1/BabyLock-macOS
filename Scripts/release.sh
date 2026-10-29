@@ -9,7 +9,7 @@ fi
 
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
   echo "usage: $0 [--yes] <version> [release-notes.md]" >&2
-  echo "example: $0 1.2.3 /tmp/release-notes-1.2.3.md" >&2
+  echo "example: $0 1.2.3 dist/release-notes-1.2.3.md" >&2
   exit 2
 fi
 
@@ -31,6 +31,8 @@ if ! [[ "$REPO" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
   echo "could not determine the GitHub repository from origin: $ORIGIN_URL" >&2
   exit 1
 fi
+
+mkdir -p "$ROOT/dist"
 
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   echo "working tree has tracked changes; commit or stash them first" >&2

@@ -60,8 +60,8 @@ version fallback. It does **not** commit.
 
 - README files describe the **current** feature set only. Do not add a
   “What's new” changelog section.
-- Put the version-specific release notes in a temporary file, for example
-  `/tmp/release-notes-1.2.3.md`. They will be written to the GitHub Release.
+- Put the version-specific release notes in a gitignored file, for example
+  `dist/release-notes-1.2.3.md`. They will be written to the GitHub Release.
 - Mention any first-hop caveat, known limitations, and the SHA256/signature
   once the release is built.
 
@@ -79,7 +79,7 @@ refuses to continue otherwise.
 ### 5. Tag and publish
 
 ```bash
-Scripts/release.sh 1.2.3 /tmp/release-notes-1.2.3.md
+Scripts/release.sh 1.2.3 dist/release-notes-1.2.3.md
 ```
 
 The script:
@@ -174,7 +174,7 @@ install.
 
 ```bash
 Scripts/bump-version.sh 1.2.3 5
-Scripts/release.sh 1.2.3 /tmp/release-notes-1.2.3.md
+Scripts/release.sh 1.2.3 dist/release-notes-1.2.3.md
 Scripts/verify-release.sh v1.2.3
 git status --short
 gh run list --workflow=build.yml --limit 10
