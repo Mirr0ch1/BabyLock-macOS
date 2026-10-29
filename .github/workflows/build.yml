@@ -116,3 +116,4 @@ jobs:
             dist/BabyLock-macOS.zip.sig
             dist/BabyLock-macOS.zip.sha256
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
