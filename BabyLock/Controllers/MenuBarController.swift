@@ -48,6 +48,13 @@ final class MenuBarController: NSObject {
         let isActive = state.isActive
         guard lastLockActive != isActive else { return }
         lastLockActive = isActive
+
+        if isActive {
+            // A settings window that was already open must not stay interactive
+            // behind a HUD-mode lock.
+            SettingsWindowController.shared.close()
+        }
+
         rebuildMenu()
     }
 
