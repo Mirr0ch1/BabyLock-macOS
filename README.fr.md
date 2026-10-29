@@ -139,6 +139,7 @@ L'app doit se trouver dans `/Applications` ou `~/Applications` pour installer un
 - Fermer le capot ou mettre le Mac en veille reverrouille automatiquement au réveil.
 - Un redémarrage, un arrêt forcé ou une fermeture forcée ne restaure pas le verrouillage ; l'état est uniquement en mémoire.
 - Le geste de déverrouillage est affiché dans le HUD. Un enfant qui sait lire peut l'apprendre ; ce n'est donc pas un verrou de sécurité fort contre des enfants plus âgés.
+- Un clavier sans touche Commande droite ne permet pas le geste de déverrouillage ; attendez le minuteur d'auto-déverrouillage ou utilisez l'appui long sur la touche d'alimentation.
 - Les autres processus de la même session, Voice Control, le partage d'écran et la gestion à distance MDM ne sont pas protégés.
 - Les versions publiées sont signées ad hoc ; macOS peut redemander les autorisations après la première installation ou une mise à jour.
 
