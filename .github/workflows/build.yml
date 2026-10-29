@@ -6,6 +6,11 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      sign:
+        description: "Sign the build artifact with the update key (without publishing a release)"
+        type: boolean
+        default: false
 
 concurrency:
   group: build-${{ github.ref }}
@@ -58,7 +63,7 @@ jobs:
           ls -lh BabyLock-macOS.zip
 
       - name: Sign update archive
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.sign
         env:
           BABYLOCK_UPDATE_SIGNING_KEY: ${{ secrets.BABYLOCK_UPDATE_SIGNING_KEY }}
         run: |
@@ -77,7 +82,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload signed release artifact
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.sign
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: BabyLock-macOS-release
