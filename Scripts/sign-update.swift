@@ -14,7 +14,7 @@ let zipURL = URL(fileURLWithPath: arguments[1])
 let signatureURL = URL(fileURLWithPath: arguments[2])
 
 guard let encodedKey = ProcessInfo.processInfo.environment["BABYLOCK_UPDATE_SIGNING_KEY"],
-      let keyData = Data(base64Encoded: encodedKey) else {
+      let keyData = Data(base64Encoded: encodedKey.trimmingCharacters(in: .whitespacesAndNewlines)) else {
     FileHandle.standardError.write(Data("BABYLOCK_UPDATE_SIGNING_KEY is missing or not base64\n".utf8))
     exit(3)
 }
