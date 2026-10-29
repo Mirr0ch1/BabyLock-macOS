@@ -25,6 +25,16 @@ Local tools required by the release scripts: `git`, `gh` (authenticated),
 `python3` with `cryptography` (`python3 -m pip install cryptography`), `unzip`,
 and `file`.
 
+This checkout also has an `upstream` remote that points at CleanLock. Pin the
+`gh` default to this repository once:
+
+```bash
+gh repo set-default Mirr0ch1/BabyLock-macOS
+```
+
+The release scripts resolve the repository from `origin` explicitly, but
+`gh workflow run` and other ad-hoc commands use the default.
+
 Never commit, paste into a chat, or upload the private key. The key is only
 needed by CI and by an offline backup.
 
