@@ -21,6 +21,10 @@ working tree and is mirrored into the GitHub Actions secret
 | Public key fingerprint | `61b78befec58185522871fd1a9c0279d97af5fc425d50ba1c44f99e5563d0cd0` |
 | Release artifacts (local) | `dist/<tag>/` (gitignored) |
 
+Local tools required by the release scripts: `git`, `gh` (authenticated),
+`python3` with `cryptography` (`python3 -m pip install cryptography`), `unzip`,
+and `file`.
+
 Never commit, paste into a chat, or upload the private key. The key is only
 needed by CI and by an offline backup.
 
