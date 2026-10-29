@@ -32,6 +32,7 @@
 		000000000000000000001226 /* InputExemption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001135 /* InputExemption.swift */; };
 		000000000000000000001227 /* ShortcutRecorderControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001136 /* ShortcutRecorderControl.swift */; };
 		000000000000000000001228 /* UpdateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001137 /* UpdateManager.swift */; };
+		000000000000000000001229 /* UpdateSigning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001138 /* UpdateSigning.swift */; };
 		000000000000000000001223 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001124 /* AppIcon.icns */; };
 		000000000000000000001224 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001401 /* InfoPlist.strings */; };
 		000000000000000000001225 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 000000000000000000001402 /* Localizable.strings */; };
@@ -64,6 +65,7 @@
 		000000000000000000001135 /* InputExemption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputExemption.swift; sourceTree = "<group>"; };
 		000000000000000000001136 /* ShortcutRecorderControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutRecorderControl.swift; sourceTree = "<group>"; };
 		000000000000000000001137 /* UpdateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateManager.swift; sourceTree = "<group>"; };
+		000000000000000000001138 /* UpdateSigning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSigning.swift; sourceTree = "<group>"; };
 		000000000000000000001123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		000000000000000000001124 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		000000000000000000001125 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				000000000000000000001109 /* CursorController.swift */,
 				000000000000000000001110 /* OverlayManager.swift */,
 				000000000000000000001137 /* UpdateManager.swift */,
+				000000000000000000001138 /* UpdateSigning.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				000000000000000000001226 /* InputExemption.swift in Sources */,
 				000000000000000000001227 /* ShortcutRecorderControl.swift in Sources */,
 				000000000000000000001228 /* UpdateManager.swift in Sources */,
+				000000000000000000001229 /* UpdateSigning.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,7 +447,7 @@
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_LANGUAGE = en;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BabyLock/Resources/Info.plist;
@@ -453,7 +457,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				ARCHS = "$(ARCHS_STANDARD)";
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mirr0ch1.babylock;
 				PRODUCT_NAME = "Baby Lock";
 				SWIFT_VERSION = 5.0;
@@ -465,7 +469,7 @@
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_LANGUAGE = en;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BabyLock/Resources/Info.plist;
@@ -475,7 +479,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				ARCHS = "$(ARCHS_STANDARD)";
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.mirr0ch1.babylock;
 				PRODUCT_NAME = "Baby Lock";
 				SWIFT_VERSION = 5.0;

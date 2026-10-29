@@ -6,13 +6,18 @@ on:
     tags: ["v*"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      sign:
+        description: "Sign the build artifact with the update key (without publishing a release)"
+        type: boolean
+        default: false
 
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -22,7 +27,7 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Show toolchain
         run: |
@@ -54,18 +59,61 @@ jobs:
         run: |
           APP="build/Build/Products/Release/Baby Lock.app"
           ditto -c -k --sequesterRsrc --keepParent "$APP" "BabyLock-macOS.zip"
+          shasum -a 256 "BabyLock-macOS.zip" > "BabyLock-macOS.zip.sha256"
           ls -lh BabyLock-macOS.zip
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7
+      - name: Sign update archive
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.sign
+        env:
+          BABYLOCK_UPDATE_SIGNING_KEY: ${{ secrets.BABYLOCK_UPDATE_SIGNING_KEY }}
+        run: |
+          if [ -z "${BABYLOCK_UPDATE_SIGNING_KEY:-}" ]; then
+            echo "BABYLOCK_UPDATE_SIGNING_KEY is not configured" >&2
+            exit 1
+          fi
+          swift Scripts/sign-update.swift BabyLock-macOS.zip BabyLock-macOS.zip.sig
+          shasum -a 256 -c BabyLock-macOS.zip.sha256
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: BabyLock-macOS
           path: BabyLock-macOS.zip
           if-no-files-found: error
 
-      - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v3
+      - name: Upload signed release artifact
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.sign
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          files: BabyLock-macOS.zip
+          name: BabyLock-macOS-release
+          path: |
+            BabyLock-macOS.zip
+            BabyLock-macOS.zip.sig
+            BabyLock-macOS.zip.sha256
+          if-no-files-found: error
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download signed artifact
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: BabyLock-macOS-release
+          path: dist
+
+      - name: Publish release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          files: |
+            dist/BabyLock-macOS.zip
+            dist/BabyLock-macOS.zip.sig
+            dist/BabyLock-macOS.zip.sha256
           generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}

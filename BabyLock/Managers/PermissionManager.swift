@@ -163,6 +163,10 @@ final class PermissionManager: ObservableObject {
         do {
             try process.run()
             process.waitUntilExit()
+
+            if process.terminationStatus != 0 {
+                NSLog("Baby Lock: tccutil reset \(service) exited with status \(process.terminationStatus)")
+            }
         } catch {
             NSLog("Baby Lock: tccutil reset \(service) failed: \(error.localizedDescription)")
         }
@@ -171,43 +175,62 @@ final class PermissionManager: ObservableObject {
     private func relaunchApplication() {
         let tempDirectory = FileManager.default.temporaryDirectory
             .appendingPathComponent("BabyLockRelaunch-\(UUID().uuidString)", isDirectory: true)
-        try? FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
-
         let scriptURL = tempDirectory.appendingPathComponent("relaunch.sh")
         let script = """
         #!/bin/sh
+        set -u
         PID="$1"
         APP="$2"
         DIR="$3"
-        while /bin/kill -0 "$PID" 2>/dev/null; do /bin/sleep 0.2; done
+        TRIES=0
+        while /bin/kill -0 "$PID" 2>/dev/null; do
+            /bin/sleep 0.2
+            TRIES=$((TRIES + 1))
+            if [ "$TRIES" -ge 300 ]; then
+                exit 1
+            fi
+        done
         /usr/bin/open "$APP"
         ( /bin/sleep 2; /bin/rm -rf "$DIR" ) >/dev/null 2>&1 &
         """
-        try? script.write(to: scriptURL, atomically: true, encoding: .utf8)
-        try? FileManager.default.setAttributes(
-            [.posixPermissions: 0o755],
-            ofItemAtPath: scriptURL.path
-        )
-
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/bin/sh")
-        process.arguments = [
-            scriptURL.path,
-            String(ProcessInfo.processInfo.processIdentifier),
-            Bundle.main.bundleURL.path,
-            tempDirectory.path
-        ]
-        process.standardOutput = FileHandle.nullDevice
-        process.standardError = FileHandle.nullDevice
 
         do {
+            try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+            try script.write(to: scriptURL, atomically: true, encoding: .utf8)
+            try FileManager.default.setAttributes(
+                [.posixPermissions: 0o755],
+                ofItemAtPath: scriptURL.path
+            )
+
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/sh")
+            process.arguments = [
+                scriptURL.path,
+                String(ProcessInfo.processInfo.processIdentifier),
+                Bundle.main.bundleURL.path,
+                tempDirectory.path
+            ]
+            process.standardOutput = FileHandle.nullDevice
+            process.standardError = FileHandle.nullDevice
+
             try process.run()
         } catch {
             NSLog("Baby Lock: relaunch failed: \(error.localizedDescription)")
+            showRelaunchError(error)
             return
         }
 
         NSApp.terminate(nil)
+    }
+
+    private func showRelaunchError(_ error: Error) {
+        let alert = NSAlert()
+        alert.messageText = AppStrings.text(.permissionIssueGeneric)
+        alert.informativeText = error.localizedDescription
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: AppStrings.text(.alertOK))
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
     }
 
     private static func currentInputMonitoringStatus() -> PermissionState {

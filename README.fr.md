@@ -56,7 +56,7 @@ Par défaut, le bureau reste exactement tel quel : pas d'écran noir, pas de cha
 
 ## Fonctionnalités
 
-- Bloque toutes les touches, y compris les raccourcis et les touches multimédia ; gardez une ou plusieurs touches actives pendant le verrouillage (par exemple 🌐 Fn pour dicter, ou `⌃` + `C` + `V` pour copier-coller).
+- Bloque toutes les touches, y compris les raccourcis, les touches multimédia et l'appui bref sur la touche d'alimentation ; gardez une ou plusieurs touches actives pendant le verrouillage (par exemple 🌐 Fn pour dicter, ou `⌃` + `C` + `V` pour copier-coller).
 - Vérifie les versions GitHub au lancement et depuis la barre des menus, puis télécharge, vérifie, installe et redémarre les mises à jour.
 - Réinitialise et redemande les autorisations depuis l'écran des autorisations après une mise à jour ou une autorisation obsolète.
 - Peut bloquer les clics, le défilement et les gestes du trackpad/de la souris, et masquer le pointeur.
@@ -94,6 +94,8 @@ Baby Lock est un fork de [CleanLock](https://github.com/fromtimo/CleanLock) et c
    xattr -dr com.apple.quarantine "/Applications/Baby Lock.app"
    ```
 
+   Téléchargez uniquement depuis les [Releases](https://github.com/Mirr0ch1/BabyLock-macOS/releases) de ce projet et vérifiez les fichiers `.sha256` et `.sig` ; n'utilisez pas de miroir tiers.
+
 5. Lancez Baby Lock et terminez la configuration guidée.
 
 ## Autorisations
@@ -125,15 +127,26 @@ Baby Lock vérifie les versions GitHub au lancement. Cette vérification est sil
 
 - le menu reste ouvert et affiche **Recherche de mises à jour…** ;
 - aucune mise à jour : **Aucune mise à jour disponible**, puis retour à **Rechercher les mises à jour** après trois secondes ;
-- mise à jour disponible : **Mise à jour vX.Y.Z — Installer** ; après confirmation, elle télécharge la version publiée, vérifie l'identifiant du bundle, la version et la signature, remplace l'app, réinitialise les autorisations et redémarre.
+- mise à jour disponible : **Mise à jour vX.Y.Z — Installer** ; après confirmation, elle télécharge la version publiée, vérifie la signature Ed25519, l'identifiant du bundle et la version, remplace l'app, réinitialise les autorisations et redémarre.
+
+Les archives de mise à jour portent une signature Ed25519. L'app épingle la clé publique ; une signature absente ou invalide est refusée et la version actuelle est conservée.
 
 L'app doit se trouver dans `/Applications` ou `~/Applications` pour installer une mise à jour. Les versions publiées sont signées ad hoc : macOS peut donc demander de réautoriser Accessibilité et Surveillance des entrées après une mise à jour. Baby Lock ouvre l'écran des autorisations et propose **Réinitialiser les autorisations et réessayer**.
+
+## Limites
+
+- Un appui bref sur la touche d'alimentation est bloqué pendant le verrouillage ; maintenir la touche 5 à 10 secondes force toujours l'arrêt, comme issue de secours matérielle.
+- Fermer le capot ou mettre le Mac en veille reverrouille automatiquement au réveil.
+- Un redémarrage, un arrêt forcé ou une fermeture forcée ne restaure pas le verrouillage ; l'état est uniquement en mémoire.
+- Le geste de déverrouillage est affiché dans le HUD. Un enfant qui sait lire peut l'apprendre ; ce n'est donc pas un verrou de sécurité fort contre des enfants plus âgés.
+- Les autres processus de la même session, Voice Control, le partage d'écran et la gestion à distance MDM ne sont pas protégés.
+- Les versions publiées sont signées ad hoc ; macOS peut redemander les autorisations après la première installation ou une mise à jour.
 
 ## Compilation
 
 ### GitHub Actions
 
-Chaque push sur `main` et chaque tag `v*` compile une app universelle `arm64 + x86_64` sur un runner macOS, la signe ad hoc et téléverse `BabyLock-macOS.zip`. Les tags publient aussi une release GitHub.
+Chaque push sur `main` et chaque tag `v*` compile une app universelle `arm64 + x86_64` sur un runner macOS, la signe ad hoc et téléverse `BabyLock-macOS.zip` ; les builds de tag produisent aussi une signature Ed25519 et un SHA256. Les tags publient une release GitHub.
 
 ### Développement local
 

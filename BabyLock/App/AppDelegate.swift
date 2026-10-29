@@ -5,6 +5,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuBarController: MenuBarController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        guard !terminateIfAnotherInstanceIsRunning() else { return }
+
         let hasCompletedOnboarding = PreferencesStore.shared.hasCompletedOnboarding
         NSApp.setActivationPolicy(hasCompletedOnboarding ? .accessory : .regular)
 
@@ -28,11 +30,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         LockModeManager.shared.stopLockMode()
     }
 
+    private func terminateIfAnotherInstanceIsRunning() -> Bool {
+        guard let bundleIdentifier = Bundle.main.bundleIdentifier else { return false }
+
+        let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleIdentifier)
+        guard running.count > 1 else { return false }
+
+        NSApp.terminate(nil)
+        return true
+    }
+
     private func installSystemObservers() {
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(handleWillSleep),
             name: NSWorkspace.willSleepNotification,
+            object: nil
+        )
+
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self,
+            selector: #selector(handleDidWake),
+            name: NSWorkspace.didWakeNotification,
             object: nil
         )
 
@@ -53,6 +72,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func handleWillSleep() {
         LockModeManager.shared.handleSystemWillSleep()
+    }
+
+    @objc private func handleDidWake() {
+        LockModeManager.shared.handleSystemDidWake()
     }
 
     @objc private func handleScreenParametersChanged() {
