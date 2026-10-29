@@ -110,6 +110,22 @@ PY
 BUILD="$(sed -n 's/.*CURRENT_PROJECT_VERSION = \([0-9]*\);.*/\1/p' BabyLock.xcodeproj/project.pbxproj | head -1)"
 PREVIOUS_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
 if [ -n "$PREVIOUS_TAG" ]; then
+  PREVIOUS_VERSION="${PREVIOUS_TAG#v}"
+  python3 - "$PREVIOUS_VERSION" "$VERSION" <<'PY'
+import sys
+
+def parse(value):
+    return tuple(int(part) for part in value.split("."))
+
+previous, current = sys.argv[1], sys.argv[2]
+try:
+    if parse(current) <= parse(previous):
+        raise SystemExit(f"version {current} must be greater than {previous}")
+except ValueError:
+    # A non-semver historical tag should not block a release.
+    pass
+PY
+
   PREVIOUS_BUILD="$(git show "$PREVIOUS_TAG:BabyLock.xcodeproj/project.pbxproj" | sed -n 's/.*CURRENT_PROJECT_VERSION = \([0-9]*\);.*/\1/p' | head -1)"
   if [ -n "$PREVIOUS_BUILD" ] && [ "$BUILD" -le "$PREVIOUS_BUILD" ]; then
     echo "build $BUILD must be greater than the build in $PREVIOUS_TAG ($PREVIOUS_BUILD)" >&2
