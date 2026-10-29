@@ -105,10 +105,15 @@ if build != debug_build or not build or not build.isdigit():
     raise SystemExit("build number mismatch between project and debug script")
 PY
 
-LAST_MAIN_RUN="$(gh run list --repo "$REPO" --workflow=build.yml --branch main --limit 1 --json status,conclusion -q '.[0].status + " " + (.[0].conclusion // "")')"
-if [ "$LAST_MAIN_RUN" != "completed success" ]; then
-  echo "latest main build is not successful: $LAST_MAIN_RUN" >&2
-  echo "wait for it to finish, then run this script again" >&2
+LAST_MAIN="$(gh run list --repo "$REPO" --workflow=build.yml --branch main --limit 1 --json status,conclusion,headSha -q '.[0] | [.status, (.conclusion // ""), .headSha] | @tsv')"
+LAST_MAIN_STATUS="$(printf '%s' "$LAST_MAIN" | awk '{print $1}')"
+LAST_MAIN_CONCLUSION="$(printf '%s' "$LAST_MAIN" | awk '{print $2}')"
+LAST_MAIN_SHA="$(printf '%s' "$LAST_MAIN" | awk '{print $3}')"
+HEAD_SHA="$(git rev-parse HEAD)"
+if [ "$LAST_MAIN_STATUS" != "completed" ] || [ "$LAST_MAIN_CONCLUSION" != "success" ] || [ "$LAST_MAIN_SHA" != "$HEAD_SHA" ]; then
+  echo "latest main build is not a successful build of $HEAD_SHA" >&2
+  echo "status=$LAST_MAIN_STATUS conclusion=$LAST_MAIN_CONCLUSION head=$LAST_MAIN_SHA" >&2
+  echo "wait for the main build to finish, then run this script again" >&2
   exit 1
 fi
 

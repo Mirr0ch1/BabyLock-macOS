@@ -157,8 +157,9 @@ install.
 
 ## Failure handling
 
-- **Tag build fails:** fix the issue on a new commit, delete the local/remote
-  tag only if no release was published, then re-tag. Never force-push a tag.
+- **Tag build fails:** tags are protected against deletion and force-push.
+  Fix the issue on a new commit and cut the next patch version. Do not try to
+  move or delete the tag.
 - **Release published but wrong:** publish a higher patch version. Do not
   overwrite the asset.
 - **Signature verification fails:** stop. Do not publish. Check that the
