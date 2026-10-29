@@ -58,6 +58,7 @@ By default the desktop stays exactly as it is: no black screen, no app switching
 
 - Blocks every key, including shortcuts and media keys; keep one or more keys working while locked (for example 🌐 Fn for dictation, or `⌃` + `C` + `V` for copy and paste).
 - Checks GitHub Releases at launch and from the menu bar, downloads a verified update, installs it in place, and restarts.
+- Resets and re-requests permissions from the permissions screen after an update or a stale grant.
 - Optionally blocks trackpad/mouse clicks, scrolling, and gestures, and hides the pointer.
 - Unlocks with `Left ⌘` + `Right ⌘` held for 3 seconds, with a progress ring.
 - Optional full-screen blackout, off by default; all displays or main display only.
@@ -65,7 +66,7 @@ By default the desktop stays exactly as it is: no black screen, no app switching
 - Native menu bar app (`LSUIElement`), no Dock icon.
 - Follows the system language, with English fallback.
 - Five languages: English, 简体中文, 繁體中文, Français, Русский.
-- No network access, no analytics, no key logging.
+- No analytics or key logging; the only network request is the GitHub update check.
 
 ## What is different from CleanLock
 
@@ -106,6 +107,8 @@ Both are used only locally. Keystrokes are never logged or transmitted. The opti
 
 > The release is ad-hoc signed, so macOS may ask for permissions again after you replace the app with a new build.
 
+If System Settings already shows the switches on but Baby Lock still says they are missing, macOS is holding a grant for the previous build. Open the permissions screen and click **Reset permissions and retry**: Baby Lock clears its Accessibility and Input Monitoring entries, relaunches, and asks again.
+
 ## Settings
 
 - **Launch at login**
@@ -118,9 +121,13 @@ Both are used only locally. Keystrokes are never logged or transmitted. The opti
 
 ## Updates
 
-Baby Lock checks GitHub Releases at launch. Use **Check for Updates** in the menu bar to check manually; when a newer version exists, the item shows the version and installs it after a confirmation.
+Baby Lock checks GitHub Releases at launch. Use **Check for Updates** in the menu bar to check manually:
 
-The update is downloaded from the release, verified, copied into the current app location, and the app restarts automatically. Release builds are ad-hoc signed, so macOS may ask you to re-authorize Accessibility and Input Monitoring after an update. Baby Lock opens the permission screen (with a reset button) for you.
+- the menu stays open and shows **Checking for Updates…**;
+- no update: **No Updates Available**, then it resets to **Check for Updates** after three seconds;
+- update available: **Update vX.Y.Z — Click to Install**; after confirmation it downloads the release, verifies the bundle ID, version, and signature, replaces the app, resets permissions, and restarts.
+
+The app must be in `/Applications` or `~/Applications` to install an update. Release builds are ad-hoc signed, so macOS may ask you to re-authorize Accessibility and Input Monitoring after an update. Baby Lock opens the permission screen and offers **Reset permissions and retry**.
 
 ## Build
 

@@ -58,6 +58,7 @@ Par défaut, le bureau reste exactement tel quel : pas d'écran noir, pas de cha
 
 - Bloque toutes les touches, y compris les raccourcis et les touches multimédia ; gardez une ou plusieurs touches actives pendant le verrouillage (par exemple 🌐 Fn pour dicter, ou `⌃` + `C` + `V` pour copier-coller).
 - Vérifie les versions GitHub au lancement et depuis la barre des menus, puis télécharge, vérifie, installe et redémarre les mises à jour.
+- Réinitialise et redemande les autorisations depuis l'écran des autorisations après une mise à jour ou une autorisation obsolète.
 - Peut bloquer les clics, le défilement et les gestes du trackpad/de la souris, et masquer le pointeur.
 - Déverrouillage avec `⌘` gauche + `⌘` droite maintenus 3 secondes, avec un anneau de progression.
 - Écran noir plein écran en option, désactivé par défaut ; tous les écrans ou l'écran principal uniquement.
@@ -106,6 +107,8 @@ Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregis
 
 > La version étant signée ad hoc, macOS peut redemander les autorisations après le remplacement de l'app par une nouvelle version.
 
+Si Réglages Système montre déjà les interrupteurs activés mais que Baby Lock dit qu'ils manquent, macOS conserve l'autorisation de la version précédente. Ouvrez l'écran des autorisations et cliquez sur **Réinitialiser les autorisations et réessayer** : Baby Lock efface ses entrées Accessibilité et Surveillance des entrées, redémarre et redemande l'accès.
+
 ## Réglages
 
 - **Ouvrir à la connexion**
@@ -118,9 +121,13 @@ Les deux sont utilisées uniquement en local. Les frappes ne sont jamais enregis
 
 ## Mises à jour
 
-Baby Lock vérifie les versions GitHub au lancement. Utilisez **Rechercher les mises à jour** dans la barre des menus pour vérifier manuellement ; lorsqu'une version plus récente existe, l'élément affiche son numéro et l'installe après confirmation.
+Baby Lock vérifie les versions GitHub au lancement. Utilisez **Rechercher les mises à jour** dans la barre des menus pour vérifier manuellement :
 
-La mise à jour est téléchargée depuis la version publiée, vérifiée, copiée à l'emplacement actuel de l'app, puis l'app redémarre automatiquement. Les versions publiées sont signées ad hoc : macOS peut donc demander de réautoriser Accessibilité et Surveillance des entrées après une mise à jour. Baby Lock ouvre l'écran des autorisations (avec un bouton de réinitialisation).
+- le menu reste ouvert et affiche **Recherche de mises à jour…** ;
+- aucune mise à jour : **Aucune mise à jour disponible**, puis retour à **Rechercher les mises à jour** après trois secondes ;
+- mise à jour disponible : **Mise à jour vX.Y.Z — Installer** ; après confirmation, elle télécharge la version publiée, vérifie l'identifiant du bundle, la version et la signature, remplace l'app, réinitialise les autorisations et redémarre.
+
+L'app doit se trouver dans `/Applications` ou `~/Applications` pour installer une mise à jour. Les versions publiées sont signées ad hoc : macOS peut donc demander de réautoriser Accessibilité et Surveillance des entrées après une mise à jour. Baby Lock ouvre l'écran des autorisations et propose **Réinitialiser les autorisations et réessayer**.
 
 ## Compilation
 
