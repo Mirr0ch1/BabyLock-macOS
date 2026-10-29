@@ -71,6 +71,11 @@ if [ -n "$NOTES" ] && [ ! -f "$NOTES" ]; then
   exit 1
 fi
 
+if ! gh secret list --repo "$REPO" | awk '{print $1}' | grep -qx "BABYLOCK_UPDATE_SIGNING_KEY"; then
+  echo "GitHub secret BABYLOCK_UPDATE_SIGNING_KEY is missing" >&2
+  exit 1
+fi
+
 python3 - "$VERSION" <<'PY'
 import re
 import sys
