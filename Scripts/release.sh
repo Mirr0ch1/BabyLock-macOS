@@ -107,6 +107,16 @@ if build != debug_build or not build or not build.isdigit():
     raise SystemExit("build number mismatch between project and debug script")
 PY
 
+BUILD="$(sed -n 's/.*CURRENT_PROJECT_VERSION = \([0-9]*\);.*/\1/p' BabyLock.xcodeproj/project.pbxproj | head -1)"
+PREVIOUS_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+if [ -n "$PREVIOUS_TAG" ]; then
+  PREVIOUS_BUILD="$(git show "$PREVIOUS_TAG:BabyLock.xcodeproj/project.pbxproj" | sed -n 's/.*CURRENT_PROJECT_VERSION = \([0-9]*\);.*/\1/p' | head -1)"
+  if [ -n "$PREVIOUS_BUILD" ] && [ "$BUILD" -le "$PREVIOUS_BUILD" ]; then
+    echo "build $BUILD must be greater than the build in $PREVIOUS_TAG ($PREVIOUS_BUILD)" >&2
+    exit 1
+  fi
+fi
+
 LAST_MAIN="$(gh run list --repo "$REPO" --workflow=build.yml --branch main --limit 1 --json status,conclusion,headSha -q '.[0] | [.status, (.conclusion // ""), .headSha] | @tsv')"
 LAST_MAIN_STATUS="$(printf '%s' "$LAST_MAIN" | awk '{print $1}')"
 LAST_MAIN_CONCLUSION="$(printf '%s' "$LAST_MAIN" | awk '{print $2}')"
